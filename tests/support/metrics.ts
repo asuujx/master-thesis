@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { Page, TestInfo } from "@playwright/test";
 
 export interface PageMetrics {
@@ -70,10 +72,13 @@ export class MetricsCollector {
       });
     });
 
+    const cloud = process.env.CLOUD_PROVIDER || "local";
+    const env = process.env.ENVIRONMENT || "local";
+
     const metrics: PageMetrics = {
       testName: this.testInfo.title,
-      environment: process.env.ENVIRONMENT || "local",
-      cloud: process.env.CLOUD_PROVIDER || "local",
+      environment: env,
+      cloud,
       timestamp: new Date().toISOString(),
       iteration: parseInt(process.env.ITERATION || "1"),
       domContentLoaded: navTiming?.domContentLoaded ?? -1,
@@ -86,19 +91,19 @@ export class MetricsCollector {
       errorMessage,
     };
 
-    // Playwright API do zapisu plików - działa po stronie Node.js runnera
-    const cloud = process.env.CLOUD_PROVIDER || "local";
-    const env = process.env.ENVIRONMENT || "local";
-    const filename = `${cloud}_${env}.json`;
+    // Accumulate results across runs into a per-cloud/env file for analysis
+    const resultsDir = "results";
+    const filePath = path.join(resultsDir, `${cloud}_${env}.json`);
+    fs.mkdirSync(resultsDir, { recursive: true });
 
-    // Odczytaj istniejące wyniki
     let existing: PageMetrics[] = [];
-    try {
-      const content = await this.testInfo.attach("read", { body: "" });
-    } catch {}
+    if (fs.existsSync(filePath)) {
+      existing = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    }
+    fs.writeFileSync(filePath, JSON.stringify([...existing, metrics], null, 2));
 
-    // Zapisz przez testInfo - trafia do results/
-    await this.testInfo.attach(filename, {
+    // Also attach to Playwright report for per-run visibility
+    await this.testInfo.attach(`${cloud}_${env}_${this.testInfo.title}.json`, {
       body: JSON.stringify(metrics, null, 2),
       contentType: "application/json",
     });
