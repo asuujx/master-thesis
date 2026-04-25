@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: "./e2e",
   fullyParallel: false,
   retries: 0,
   workers: 1,
@@ -16,6 +16,19 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
+
+  // Locally: spin up the stack automatically.
+  // On a pipeline: BASE_URL points to the deployed app, skip this entirely.
+  webServer: process.env.BASE_URL
+    ? undefined
+    : {
+        command: "docker compose -f ../app/docker-compose.yml up",
+        url: "http://localhost:8080",
+        timeout: 120_000,
+        reuseExistingServer: true,
+        stdout: "pipe",
+        stderr: "pipe",
+      },
 
   /* Configure projects for major browsers */
   projects: [
