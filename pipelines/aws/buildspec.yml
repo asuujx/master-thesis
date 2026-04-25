@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - npm ci
+      - npx playwright install chromium --with-deps
+
+  build:
+    env:
+      variables:
+        CLOUD_PROVIDER: aws
+        ENVIRONMENT: eks
+    commands:
+      - npm run e2e
+
+artifacts:
+  files:
+    - results/**/*
+    - test-results/**/*
