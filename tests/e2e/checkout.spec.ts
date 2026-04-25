@@ -16,7 +16,7 @@ const formData: CheckoutFormData = {
   country: chance.country({ full: true }),
   creditCardNumber: chance.cc({ type: "Visa" }),
   creditCardExpirationMonth: chance.month(),
-  creditCardExpirationYear: chance.year({ min: 2026, max: 2037 }).toString(),
+  creditCardExpirationYear: chance.year({ min: new Date().getFullYear(), max: new Date().getFullYear() + 4 }).toString(),
   creditCardCvv: chance.integer({ min: 100, max: 999 }).toString(),
 };
 
