@@ -1,0 +1,13 @@
+.claude
+
+# Dependencies
+node_modules/
+
+# Playwright - heavy artifacts (traces, videos, screenshots, HTML report)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+
+# results/ is intentionally tracked - clean JSON test output only
