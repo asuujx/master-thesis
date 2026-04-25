@@ -9,5 +9,9 @@ playwright-report/
 blob-report/
 playwright/.cache/
 playwright/.auth/
+results/
 
-# results/ is intentionally tracked - clean JSON test output only
+# Terraform
+infrastructure/**/.terraform/
+infrastructure/**/terraform.tfstate*
+infrastructure/**/*.tfvars.secret
