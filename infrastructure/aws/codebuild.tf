@@ -31,6 +31,11 @@ resource "aws_iam_role_policy" "codebuild" {
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:GetObject"]
         Resource = "${aws_s3_bucket.artifacts.arn}/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = aws_s3_bucket.artifacts.arn
       }
     ]
   })
@@ -41,11 +46,7 @@ resource "aws_codebuild_project" "playwright" {
   service_role = aws_iam_role.codebuild.arn
 
   artifacts {
-    type      = "S3"
-    location  = aws_s3_bucket.artifacts.bucket
-    path      = "runs"
-    name      = "results"
-    packaging = "ZIP"
+    type = "NO_ARTIFACTS"
   }
 
   environment {
@@ -59,6 +60,11 @@ resource "aws_codebuild_project" "playwright" {
     }
 
     environment_variable {
+      name  = "ITERATION"
+      value = "1"
+    }
+
+    environment_variable {
       name  = "CLOUD_PROVIDER"
       value = "aws"
     }
@@ -66,6 +72,11 @@ resource "aws_codebuild_project" "playwright" {
     environment_variable {
       name  = "ENVIRONMENT"
       value = "eks"
+    }
+
+    environment_variable {
+      name  = "ARTIFACTS_BUCKET"
+      value = aws_s3_bucket.artifacts.bucket
     }
   }
 

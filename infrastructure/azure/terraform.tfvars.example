@@ -1,0 +1,6 @@
+subscription_id  = ""
+azure_region     = "germanywestcentral"
+aks_node_vm_size = "Standard_D2s_v3"
+aks_node_count   = 2
+storage_suffix   = "pb01"
+github_repo      = "https://github.com/asuujx/master-thesis"

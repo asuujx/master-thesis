@@ -18,7 +18,8 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 resource "aws_eks_cluster" "main" {
   name     = "thesis-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.30"
+  # EKS upgrade path: 1.30 → 1.31 → 1.32 (one minor version at a time). Destroy+recreate is also valid.
+  version  = "1.32"
 
   vpc_config {
     subnet_ids             = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)

@@ -1,5 +1,11 @@
 version: 0.2
 
+env:
+  variables:
+    CLOUD_PROVIDER: aws
+    ENVIRONMENT: eks
+    ITERATION: "1"
+
 phases:
   install:
     runtime-versions:
@@ -9,14 +15,10 @@ phases:
       - npx playwright install chromium --with-deps
 
   build:
-    env:
-      variables:
-        CLOUD_PROVIDER: aws
-        ENVIRONMENT: eks
     commands:
       - npm run e2e
 
-artifacts:
-  files:
-    - results/**/*
-    - test-results/**/*
+  post_build:
+    commands:
+      - aws s3 sync results/ s3://$ARTIFACTS_BUCKET/runs/$CODEBUILD_BUILD_ID/results/ --quiet || true
+      - aws s3 sync test-results/ s3://$ARTIFACTS_BUCKET/runs/$CODEBUILD_BUILD_ID/test-results/ --quiet || true

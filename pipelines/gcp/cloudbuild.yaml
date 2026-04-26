@@ -1,0 +1,25 @@
+steps:
+  - name: 'node:20'
+    id: 'test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        npm ci &&
+        npx playwright install chromium --with-deps &&
+        npm run e2e
+    env:
+      - 'CLOUD_PROVIDER=gcp'
+      - 'ENVIRONMENT=gke'
+      - 'BASE_URL=$_BASE_URL'
+      - 'ITERATION=$_ITERATION'
+
+artifacts:
+  objects:
+    location: 'gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID'
+    paths:
+      - 'results/**/*'
+      - 'test-results/**/*'
+
+options:
+  logging: GCS_ONLY

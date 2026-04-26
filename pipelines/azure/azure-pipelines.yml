@@ -1,0 +1,49 @@
+parameters:
+  - name: baseUrl
+    displayName: 'Frontend base URL (e.g. http://1.2.3.4)'
+    type: string
+  - name: iteration
+    displayName: 'Iteration number'
+    type: string
+    default: '1'
+
+trigger: none
+
+# Microsoft-hosted agents do not support region selection — the runner may be in West Europe (Amsterdam)
+# rather than germanywestcentral where the AKS cluster resides. This introduces ~5-10 ms extra latency
+# compared to AWS CodeBuild (eu-central-1) and GCP Cloud Build (europe-west3) which run in-region.
+# Documented as a limitation in the thesis.
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - script: |
+      npm ci
+      npx playwright install chromium --with-deps
+    displayName: Install dependencies
+
+  - script: npm run e2e
+    displayName: Run Playwright tests
+    env:
+      CLOUD_PROVIDER: azure
+      ENVIRONMENT: aks
+      BASE_URL: ${{ parameters.baseUrl }}
+      ITERATION: ${{ parameters.iteration }}
+
+  - script: |
+      az storage blob upload-batch \
+        --account-name $(STORAGE_ACCOUNT_NAME) \
+        --account-key $(STORAGE_ACCOUNT_KEY) \
+        --destination artifacts \
+        --destination-path "runs/$(Build.BuildId)" \
+        --source . \
+        --pattern "results/**" || true
+      az storage blob upload-batch \
+        --account-name $(STORAGE_ACCOUNT_NAME) \
+        --account-key $(STORAGE_ACCOUNT_KEY) \
+        --destination artifacts \
+        --destination-path "runs/$(Build.BuildId)" \
+        --source . \
+        --pattern "test-results/**" || true
+    displayName: Upload artifacts to Blob Storage
+    condition: always()
