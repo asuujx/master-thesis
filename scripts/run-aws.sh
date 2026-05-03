@@ -4,6 +4,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+[ -f "$REPO_ROOT/.env" ] && set -a && source "$REPO_ROOT/.env" && set +a
 TF_DIR="$REPO_ROOT/infrastructure/aws"
 ITERATIONS="${ITERATIONS:-1}"
 
@@ -17,13 +18,40 @@ cleanup() {
   echo "  Waiting 60s for ELB to be fully deprovisioned..."
   sleep 60
 
-  echo "==> Destroying AWS infrastructure..."
-  tg destroy -auto-approve || true
+  echo "==> Detaching persistent resources from state (IAM roles, S3, and CodeBuild project survive between runs)..."
+  tg state rm aws_s3_bucket.artifacts          2>/dev/null || true
+  tg state rm aws_iam_role.codebuild           2>/dev/null || true
+  tg state rm aws_iam_role.eks_cluster         2>/dev/null || true
+  tg state rm aws_iam_role.eks_nodes           2>/dev/null || true
+  tg state rm aws_codebuild_project.playwright 2>/dev/null || true
+
+  echo "==> Destroying ephemeral AWS infrastructure..."
+  tg destroy -auto-approve
 }
 trap cleanup EXIT
 
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
 echo "==> Provisioning AWS infrastructure..."
 tg init -input=false
+
+echo "==> Reconciling pre-existing AWS resources..."
+try_import() {
+  local resource="$1" id="$2"
+  if tg state show "$resource" >/dev/null 2>&1; then
+    echo "  already in state: $resource"
+    return 0
+  fi
+  tg import -input=false "$resource" "$id" \
+    && echo "  imported: $resource" \
+    || echo "  not found in AWS, will be created: $resource"
+}
+try_import aws_s3_bucket.artifacts          "thesis-test-artifacts-$ACCOUNT_ID"
+try_import aws_iam_role.codebuild           "thesis-codebuild-role"
+try_import aws_iam_role.eks_cluster         "thesis-eks-cluster-role"
+try_import aws_iam_role.eks_nodes           "thesis-eks-node-role"
+try_import aws_codebuild_project.playwright "thesis-playwright-tests"
+
 tg apply -auto-approve -input=false
 
 REGION=$(tg output -raw aws_region)
