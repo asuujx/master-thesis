@@ -1,3 +1,11 @@
+output "gcp_region" {
+  value = var.gcp_region
+}
+
+output "project_id" {
+  value = var.project_id
+}
+
 output "gke_cluster_name" {
   value = google_container_cluster.main.name
 }

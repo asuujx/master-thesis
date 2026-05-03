@@ -18,8 +18,8 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 resource "aws_eks_cluster" "main" {
   name     = "thesis-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
-  # EKS upgrade path: 1.30 → 1.31 → 1.32 (one minor version at a time). Destroy+recreate is also valid.
-  version  = "1.32"
+  # EKS upgrade path: one minor version at a time. Destroy+recreate is also valid.
+  version  = var.k8s_version
 
   vpc_config {
     subnet_ids             = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)
@@ -61,12 +61,12 @@ resource "aws_eks_node_group" "main" {
   node_group_name = "thesis-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = aws_subnet.private[*].id
-  instance_types  = [var.eks_node_instance_type]
+  instance_types  = [var.node_instance_type]
 
   scaling_config {
-    desired_size = var.eks_node_count
+    desired_size = var.node_count
     min_size     = 1
-    max_size     = var.eks_node_count
+    max_size     = var.node_count
   }
 
   depends_on = [

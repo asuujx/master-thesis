@@ -1,3 +1,30 @@
+# Shared — injected from root terragrunt.hcl
+variable "k8s_version" {
+  description = "Kubernetes version for the AKS cluster."
+  type        = string
+}
+
+variable "node_count" {
+  description = "Number of AKS worker nodes."
+  type        = number
+}
+
+variable "node_cidr" {
+  description = "CIDR for the VNet node subnet."
+  type        = string
+}
+
+variable "pod_cidr" {
+  description = "CIDR for Kubernetes pods."
+  type        = string
+}
+
+variable "service_cidr" {
+  description = "CIDR for Kubernetes services."
+  type        = string
+}
+
+# Azure-specific
 variable "subscription_id" {
   description = "Azure subscription ID."
   type        = string
@@ -6,23 +33,15 @@ variable "subscription_id" {
 variable "azure_region" {
   description = "Azure region for all resources."
   type        = string
-  default     = "germanywestcentral"
 }
 
-variable "aks_node_vm_size" {
-  description = "VM size for AKS worker nodes (Standard_DC2ads_v5: 2 vCPU x86 AMD, 8 GB ≈ e2-standard-2)."
+variable "node_vm_size" {
+  description = "VM size for AKS worker nodes (Standard_D2s_v3 ≈ e2-standard-2: 2 vCPU, 8 GB)."
   type        = string
-  default     = "Standard_D2s_v3"
-}
-
-variable "aks_node_count" {
-  description = "Number of AKS worker nodes."
-  type        = number
-  default     = 2
 }
 
 variable "storage_suffix" {
-  description = "Short unique suffix for the storage account name (3-8 lowercase alphanumeric chars, e.g. your initials + digits)."
+  description = "Short unique suffix for the storage account name (3-8 lowercase alphanumeric chars)."
   type        = string
 
   validation {
