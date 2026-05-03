@@ -11,7 +11,9 @@ playwright/.cache/
 playwright/.auth/
 results/
 
-# Terraform
+# Terraform / Terragrunt
 infrastructure/**/.terraform/
 infrastructure/**/terraform.tfstate*
 infrastructure/**/*.tfvars.secret
+infrastructure/**/.terragrunt-cache/
+infrastructure/**/terraform.tfvars
