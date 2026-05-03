@@ -9,6 +9,12 @@ parameters:
 
 trigger: none
 
+variables:
+  - name: STORAGE_ACCOUNT_NAME
+    value: ''
+  - name: STORAGE_ACCOUNT_KEY
+    value: ''
+
 # Microsoft-hosted agents do not support region selection — the runner may be in West Europe (Amsterdam)
 # rather than germanywestcentral where the AKS cluster resides. This introduces ~5-10 ms extra latency
 # compared to AWS CodeBuild (eu-central-1) and GCP Cloud Build (europe-west3) which run in-region.
