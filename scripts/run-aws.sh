@@ -74,6 +74,10 @@ aws eks update-kubeconfig --region "$REGION" --name "$CLUSTER"
 echo "==> Waiting for nodes to be ready..."
 kubectl wait --for=condition=Ready node --all --timeout=300s
 
+echo "==> Installing metrics-server (not bundled with EKS)..."
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl rollout status deployment/metrics-server -n kube-system --timeout=120s
+
 echo "==> Deploying app..."
 DEPLOY_START=$SECONDS
 kubectl apply -f "$REPO_ROOT/app/manifests/kubernetes-manifests.yaml"
@@ -102,6 +106,13 @@ SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 SUITE_START_S=$SECONDS
 
 for i in $(seq 1 "$ITERATIONS"); do
+  METRICS_DIR="$REPO_ROOT/metrics/aws/$DATETIME/iteration-$i"
+  mkdir -p "$METRICS_DIR"
+
+  echo "==> Capturing Kubernetes metrics before iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "before" "$METRICS_DIR/kube_metrics_before.json" \
+    || echo "  WARNING: kube metrics capture failed"
+
   echo "==> Running test iteration $i/$ITERATIONS..."
   BUILD_ID=$(aws codebuild start-build \
     --project-name "$CODEBUILD_PROJECT" \
@@ -128,13 +139,15 @@ for i in $(seq 1 "$ITERATIONS"); do
   [ "$STATUS" != "SUCCEEDED" ] && echo "WARNING: iteration $i finished with status $STATUS"
 
   echo "==> Downloading metrics for iteration $i..."
-  METRICS_DIR="$REPO_ROOT/metrics/aws/$DATETIME/iteration-$i"
-  mkdir -p "$METRICS_DIR"
   if aws s3 sync "s3://$BUCKET/runs/$BUILD_ID/results/" "$METRICS_DIR/" --region "$REGION"; then
     echo "  Saved to $METRICS_DIR ($(find "$METRICS_DIR" -name '*.json' | wc -l | tr -d ' ') file(s))"
   else
     echo "  WARNING: metrics download failed — artifacts may be at s3://$BUCKET/runs/$BUILD_ID/results/"
   fi
+
+  echo "==> Capturing Kubernetes metrics after iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "after" "$METRICS_DIR/kube_metrics_after.json" \
+    || echo "  WARNING: kube metrics capture failed"
 done
 
 SUITE_DURATION=$((SECONDS - SUITE_START_S))

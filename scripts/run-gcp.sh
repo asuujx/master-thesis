@@ -85,6 +85,13 @@ SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 SUITE_START_S=$SECONDS
 
 for i in $(seq 1 "$ITERATIONS"); do
+  METRICS_DIR="$REPO_ROOT/metrics/gcp/$DATETIME/iteration-$i"
+  mkdir -p "$METRICS_DIR"
+
+  echo "==> Capturing Kubernetes metrics before iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "before" "$METRICS_DIR/kube_metrics_before.json" \
+    || echo "  WARNING: kube metrics capture failed"
+
   echo "==> Running test iteration $i/$ITERATIONS..."
   if BUILD_ID=$(gcloud builds submit "$REPO_ROOT" \
     --config="$REPO_ROOT/pipelines/gcp/cloudbuild.yaml" \
@@ -103,8 +110,6 @@ for i in $(seq 1 "$ITERATIONS"); do
   [ "$STATUS" != "SUCCESS" ] && echo "WARNING: iteration $i finished with status $STATUS"
 
   echo "==> Downloading metrics for iteration $i..."
-  METRICS_DIR="$REPO_ROOT/metrics/gcp/$DATETIME/iteration-$i"
-  mkdir -p "$METRICS_DIR"
   GCS_CONTENTS=$(gsutil ls -r "gs://$BUCKET/runs/$BUILD_ID/" 2>/dev/null || true)
   JSON_URLS=$(echo "$GCS_CONTENTS" | grep '\.json$' || true)
   if [ -n "$JSON_URLS" ]; then
@@ -114,6 +119,10 @@ for i in $(seq 1 "$ITERATIONS"); do
     echo "  WARNING: no JSON metrics found at gs://$BUCKET/runs/$BUILD_ID/"
     echo "  GCS contents: $GCS_CONTENTS"
   fi
+
+  echo "==> Capturing Kubernetes metrics after iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "after" "$METRICS_DIR/kube_metrics_after.json" \
+    || echo "  WARNING: kube metrics capture failed"
 done
 
 SUITE_DURATION=$((SECONDS - SUITE_START_S))

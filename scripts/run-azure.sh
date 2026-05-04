@@ -116,6 +116,13 @@ SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 SUITE_START_S=$SECONDS
 
 for i in $(seq 1 "$ITERATIONS"); do
+  METRICS_DIR="$REPO_ROOT/metrics/azure/$DATETIME/iteration-$i"
+  mkdir -p "$METRICS_DIR"
+
+  echo "==> Capturing Kubernetes metrics before iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "before" "$METRICS_DIR/kube_metrics_before.json" \
+    || echo "  WARNING: kube metrics capture failed"
+
   echo "==> Running test iteration $i/$ITERATIONS..."
   RUN_ID=$(az pipelines run \
     --name "$PIPELINE_NAME" \
@@ -137,8 +144,6 @@ for i in $(seq 1 "$ITERATIONS"); do
   [ "$RESULT" != "succeeded" ] && echo "WARNING: iteration $i finished with result $RESULT"
 
   echo "==> Downloading metrics for iteration $i..."
-  METRICS_DIR="$REPO_ROOT/metrics/azure/$DATETIME/iteration-$i"
-  mkdir -p "$METRICS_DIR"
   TMP_DL=$(mktemp -d)
   if az storage blob download-batch \
        --account-name "$STORAGE_ACCOUNT" \
@@ -152,6 +157,10 @@ for i in $(seq 1 "$ITERATIONS"); do
     echo "  WARNING: metrics download failed — check storage account $STORAGE_ACCOUNT, container artifacts"
   fi
   rm -rf "$TMP_DL"
+
+  echo "==> Capturing Kubernetes metrics after iteration $i..."
+  bash "$REPO_ROOT/scripts/metrics/capture-kube-metrics.sh" "after" "$METRICS_DIR/kube_metrics_after.json" \
+    || echo "  WARNING: kube metrics capture failed"
 done
 
 SUITE_DURATION=$((SECONDS - SUITE_START_S))
