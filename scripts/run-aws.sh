@@ -59,7 +59,9 @@ try_import aws_iam_role.eks_cluster         "thesis-eks-cluster-role"
 try_import aws_iam_role.eks_nodes           "thesis-eks-node-role"
 try_import aws_codebuild_project.playwright "thesis-playwright-tests"
 
+PROVISION_START=$SECONDS
 tg apply -auto-approve -input=false
+PROVISION_DURATION=$((SECONDS - PROVISION_START))
 
 REGION=$(tg output -raw aws_region)
 CLUSTER=$(tg output -raw eks_cluster_name)
@@ -73,12 +75,15 @@ echo "==> Waiting for nodes to be ready..."
 kubectl wait --for=condition=Ready node --all --timeout=300s
 
 echo "==> Deploying app..."
+DEPLOY_START=$SECONDS
 kubectl apply -f "$REPO_ROOT/app/manifests/kubernetes-manifests.yaml"
 
 echo "==> Waiting for frontend deployment..."
 kubectl rollout status deployment/frontend --timeout=300s
+DEPLOY_DURATION=$((SECONDS - DEPLOY_START))
 
 echo "==> Waiting for LoadBalancer hostname (this can take 2-5 minutes on EKS)..."
+LB_START=$SECONDS
 HOSTNAME=""
 for i in $(seq 1 30); do
   HOSTNAME=$(kubectl get service frontend-external \
@@ -88,10 +93,13 @@ for i in $(seq 1 30); do
   sleep 20
 done
 [ -z "$HOSTNAME" ] && { echo "ERROR: LoadBalancer hostname not assigned after 10 minutes"; exit 1; }
+LB_DURATION=$((SECONDS - LB_START))
 BASE_URL="http://$HOSTNAME"
 echo "==> App URL: $BASE_URL"
 
 DATETIME=$(date +%Y-%m-%d_%H-%M-%S)
+SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+SUITE_START_S=$SECONDS
 
 for i in $(seq 1 "$ITERATIONS"); do
   echo "==> Running test iteration $i/$ITERATIONS..."
@@ -129,7 +137,31 @@ for i in $(seq 1 "$ITERATIONS"); do
   fi
 done
 
+SUITE_DURATION=$((SECONDS - SUITE_START_S))
+SUITE_END_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
 echo "==> Generating summary..."
 node "$REPO_ROOT/scripts/summarize.js" "$REPO_ROOT/metrics/aws/$DATETIME"
+
+echo "==> Writing run metadata..."
+cat > "$REPO_ROOT/metrics/aws/$DATETIME/run_metadata.json" << METADATA_EOF
+{
+  "cloud": "aws",
+  "environment": "eks",
+  "nodeType": "$NODE_TYPE",
+  "nodeCount": $NODE_COUNT,
+  "k8sVersion": "$K8S_VERSION",
+  "clusterRegion": "$REGION",
+  "lbType": "$LB_TYPE",
+  "runnerType": "$RUNNER_TYPE",
+  "iterationCount": $ITERATIONS,
+  "suiteStartUtc": "$SUITE_START_UTC",
+  "suiteEndUtc": "$SUITE_END_UTC",
+  "infrastructureProvisioningSeconds": $PROVISION_DURATION,
+  "appDeploySeconds": $DEPLOY_DURATION,
+  "lbReadySeconds": $LB_DURATION,
+  "totalTestSuiteDurationSeconds": $SUITE_DURATION
+}
+METADATA_EOF
 
 echo "==> All $ITERATIONS iteration(s) complete."
