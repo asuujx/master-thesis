@@ -10,6 +10,7 @@ export interface PageMetrics {
   cloud: string;
   timestamp: string;
   iteration: number;
+  attemptNumber: number;
   passed: boolean;
   errorMessage?: string;
 
@@ -174,7 +175,8 @@ export class MetricsCollector {
       environment: env,
       cloud,
       timestamp:   new Date().toISOString(),
-      iteration:   parseInt(process.env.ITERATION ?? "1"),
+      iteration:     parseInt(process.env.ITERATION ?? "1"),
+      attemptNumber: this.testInfo.retry + 1,
       passed,
       errorMessage,
       testDuration,
