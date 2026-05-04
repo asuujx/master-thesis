@@ -10,6 +10,13 @@ ITERATIONS="${ITERATIONS:-1}"
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
+# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/aws/eks.tf
+K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE="t3.medium"
+LB_TYPE="aws-classic-lb"
+RUNNER_TYPE="codebuild"
+
 cleanup() {
   echo "==> Removing Kubernetes LoadBalancer service (releases ELB before VPC destroy)..."
   # ELBs created by k8s services are outside Terraform state. If they still exist when
@@ -93,6 +100,12 @@ for i in $(seq 1 "$ITERATIONS"); do
     --environment-variables-override \
       "name=BASE_URL,value=$BASE_URL,type=PLAINTEXT" \
       "name=ITERATION,value=$i,type=PLAINTEXT" \
+      "name=NODE_TYPE,value=$NODE_TYPE,type=PLAINTEXT" \
+      "name=NODE_COUNT,value=$NODE_COUNT,type=PLAINTEXT" \
+      "name=K8S_VERSION,value=$K8S_VERSION,type=PLAINTEXT" \
+      "name=CLUSTER_REGION,value=$REGION,type=PLAINTEXT" \
+      "name=LB_TYPE,value=$LB_TYPE,type=PLAINTEXT" \
+      "name=RUNNER_TYPE,value=$RUNNER_TYPE,type=PLAINTEXT" \
     --query 'build.id' --output text)
   echo "  Build ID: $BUILD_ID"
 

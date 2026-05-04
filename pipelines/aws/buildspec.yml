@@ -5,6 +5,12 @@ env:
     CLOUD_PROVIDER: aws
     ENVIRONMENT: eks
     ITERATION: "1"
+    NODE_TYPE: t3.medium
+    NODE_COUNT: "2"
+    K8S_VERSION: "1.35"
+    CLUSTER_REGION: eu-central-1
+    LB_TYPE: aws-classic-lb
+    RUNNER_TYPE: codebuild
 
 phases:
   install:

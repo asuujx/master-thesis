@@ -18,6 +18,13 @@ az devops configure --defaults \
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
+# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/azure/aks.tf
+K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE="Standard_D2ads_v5"
+LB_TYPE="azure-lb"
+RUNNER_TYPE="azure-pipelines"
+
 ensure_pipeline() {
   if az pipelines show --name "$PIPELINE_NAME" --output none 2>/dev/null; then
     echo "  Pipeline '$PIPELINE_NAME' already exists"
@@ -106,6 +113,8 @@ for i in $(seq 1 "$ITERATIONS"); do
     --name "$PIPELINE_NAME" \
     --parameters "baseUrl=$BASE_URL" "iteration=$i" \
     --variables "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT" "STORAGE_ACCOUNT_KEY=$STORAGE_KEY" \
+      "NODE_TYPE=$NODE_TYPE" "NODE_COUNT=$NODE_COUNT" "K8S_VERSION=$K8S_VERSION" \
+      "CLUSTER_REGION=germanywestcentral" "LB_TYPE=$LB_TYPE" "RUNNER_TYPE=$RUNNER_TYPE" \
     --query "id" --output tsv)
   echo "  Pipeline run ID: $RUN_ID"
 

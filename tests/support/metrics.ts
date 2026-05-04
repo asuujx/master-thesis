@@ -14,6 +14,14 @@ export interface PageMetrics {
   passed: boolean;
   errorMessage?: string;
 
+  // Runtime environment metadata
+  nodeType: string;
+  nodeCount: number;
+  k8sVersion: string;
+  clusterRegion: string;
+  lbType: string;
+  runnerType: string;
+
   // Test-level
   testDuration: number;
 
@@ -179,6 +187,12 @@ export class MetricsCollector {
       attemptNumber: this.testInfo.retry + 1,
       passed,
       errorMessage,
+      nodeType:      process.env.NODE_TYPE      ?? "unknown",
+      nodeCount:     parseInt(process.env.NODE_COUNT ?? "0"),
+      k8sVersion:    process.env.K8S_VERSION    ?? "unknown",
+      clusterRegion: process.env.CLUSTER_REGION ?? "unknown",
+      lbType:        process.env.LB_TYPE        ?? "unknown",
+      runnerType:    process.env.RUNNER_TYPE    ?? "unknown",
       testDuration,
       ttfb:                      timing?.ttfb                      ?? -1,
       domInteractive:            timing?.domInteractive            ?? -1,

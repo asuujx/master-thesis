@@ -35,6 +35,12 @@ steps:
       ENVIRONMENT: aks
       BASE_URL: ${{ parameters.baseUrl }}
       ITERATION: ${{ parameters.iteration }}
+      NODE_TYPE: $(NODE_TYPE)
+      NODE_COUNT: $(NODE_COUNT)
+      K8S_VERSION: $(K8S_VERSION)
+      CLUSTER_REGION: $(CLUSTER_REGION)
+      LB_TYPE: $(LB_TYPE)
+      RUNNER_TYPE: $(RUNNER_TYPE)
 
   - script: |
       az storage blob upload-batch \

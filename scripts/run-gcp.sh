@@ -13,6 +13,13 @@ ZONE="${REGION}-c"
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
+# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/gcp/gke.tf
+K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE="e2-standard-2"
+LB_TYPE="gcp-https-lb"
+RUNNER_TYPE="cloud-build"
+
 cleanup() {
   echo "==> Destroying GCP infrastructure..."
   tg destroy -auto-approve
@@ -75,7 +82,7 @@ for i in $(seq 1 "$ITERATIONS"); do
     --config="$REPO_ROOT/pipelines/gcp/cloudbuild.yaml" \
     --project="$PROJECT" \
     --region="$REGION" \
-    --substitutions="_BASE_URL=$BASE_URL,_ITERATION=$i" \
+    --substitutions="_BASE_URL=$BASE_URL,_ITERATION=$i,_NODE_TYPE=$NODE_TYPE,_NODE_COUNT=$NODE_COUNT,_K8S_VERSION=$K8S_VERSION,_CLUSTER_REGION=$REGION,_LB_TYPE=$LB_TYPE,_RUNNER_TYPE=$RUNNER_TYPE" \
     --format="value(id)" \
     --suppress-logs); then
     STATUS="SUCCESS"

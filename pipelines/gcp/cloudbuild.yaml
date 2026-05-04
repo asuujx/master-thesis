@@ -13,6 +13,12 @@ steps:
       - 'ENVIRONMENT=gke'
       - 'BASE_URL=$_BASE_URL'
       - 'ITERATION=$_ITERATION'
+      - 'NODE_TYPE=$_NODE_TYPE'
+      - 'NODE_COUNT=$_NODE_COUNT'
+      - 'K8S_VERSION=$_K8S_VERSION'
+      - 'CLUSTER_REGION=$_CLUSTER_REGION'
+      - 'LB_TYPE=$_LB_TYPE'
+      - 'RUNNER_TYPE=$_RUNNER_TYPE'
 
 artifacts:
   objects:
