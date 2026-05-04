@@ -15,7 +15,7 @@ tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
 cleanup() {
   echo "==> Destroying GCP infrastructure..."
-  tg destroy -auto-approve || true
+  tg destroy -auto-approve
 }
 trap cleanup EXIT
 
@@ -71,33 +71,33 @@ DATETIME=$(date +%Y-%m-%d_%H-%M-%S)
 
 for i in $(seq 1 "$ITERATIONS"); do
   echo "==> Running test iteration $i/$ITERATIONS..."
-  BUILD_ID=$(gcloud builds submit "$REPO_ROOT" \
+  if BUILD_ID=$(gcloud builds submit "$REPO_ROOT" \
     --config="$REPO_ROOT/pipelines/gcp/cloudbuild.yaml" \
     --project="$PROJECT" \
     --region="$REGION" \
     --substitutions="_BASE_URL=$BASE_URL,_ITERATION=$i" \
     --format="value(id)" \
-    --async)
+    --suppress-logs); then
+    STATUS="SUCCESS"
+  else
+    STATUS="FAILURE"
+  fi
   echo "  Build ID: $BUILD_ID"
-
-  STATUS="WORKING"
-  while [ "$STATUS" = "WORKING" ] || [ "$STATUS" = "QUEUED" ]; do
-    sleep 30
-    STATUS=$(gcloud builds describe "$BUILD_ID" \
-      --project="$PROJECT" --region="$REGION" --format="value(status)")
-    echo "  Status: $STATUS"
-  done
+  echo "  Status: $STATUS"
 
   [ "$STATUS" != "SUCCESS" ] && echo "WARNING: iteration $i finished with status $STATUS"
 
   echo "==> Downloading metrics for iteration $i..."
   METRICS_DIR="$REPO_ROOT/metrics/gcp/$DATETIME/iteration-$i"
   mkdir -p "$METRICS_DIR"
-  if gcloud storage rsync -r "gs://$BUCKET/runs/$BUILD_ID/results" "$METRICS_DIR" \
-       --project="$PROJECT"; then
+  GCS_CONTENTS=$(gsutil ls -r "gs://$BUCKET/runs/$BUILD_ID/" 2>/dev/null || true)
+  JSON_URLS=$(echo "$GCS_CONTENTS" | grep '\.json$' || true)
+  if [ -n "$JSON_URLS" ]; then
+    echo "$JSON_URLS" | gsutil -m -o "GSUtil:parallel_process_count=1" cp -I "$METRICS_DIR/"
     echo "  Saved to $METRICS_DIR ($(find "$METRICS_DIR" -name '*.json' | wc -l | tr -d ' ') file(s))"
   else
-    echo "  WARNING: metrics download failed — artifacts may be at gs://$BUCKET/runs/$BUILD_ID/"
+    echo "  WARNING: no JSON metrics found at gs://$BUCKET/runs/$BUILD_ID/"
+    echo "  GCS contents: $GCS_CONTENTS"
   fi
 done
 
