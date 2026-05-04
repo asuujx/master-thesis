@@ -22,6 +22,7 @@ phases:
 
   build:
     commands:
+      - bash scripts/metrics/measure-rtt.sh "$BASE_URL"
       - npm run e2e
 
   post_build:

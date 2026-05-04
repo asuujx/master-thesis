@@ -120,7 +120,7 @@ SUITE_DURATION=$((SECONDS - SUITE_START_S))
 SUITE_END_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 echo "==> Generating summary..."
-node "$REPO_ROOT/scripts/summarize.js" "$REPO_ROOT/metrics/gcp/$DATETIME"
+node "$REPO_ROOT/scripts/metrics/summarize.js" "$REPO_ROOT/metrics/gcp/$DATETIME"
 
 echo "==> Writing run metadata..."
 cat > "$REPO_ROOT/metrics/gcp/$DATETIME/run_metadata.json" << METADATA_EOF

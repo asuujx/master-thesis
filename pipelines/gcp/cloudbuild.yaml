@@ -7,6 +7,7 @@ steps:
       - |
         npm ci &&
         npx playwright install chromium --with-deps &&
+        bash scripts/metrics/measure-rtt.sh "$BASE_URL" &&
         npm run e2e
     env:
       - 'CLOUD_PROVIDER=gcp'

@@ -28,6 +28,9 @@ steps:
       npx playwright install chromium --with-deps
     displayName: Install dependencies
 
+  - script: bash scripts/metrics/measure-rtt.sh "${{ parameters.baseUrl }}"
+    displayName: Measure network RTT
+
   - script: npm run e2e
     displayName: Run Playwright tests
     env:
