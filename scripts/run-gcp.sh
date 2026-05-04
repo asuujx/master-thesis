@@ -101,4 +101,7 @@ for i in $(seq 1 "$ITERATIONS"); do
   fi
 done
 
+echo "==> Generating summary..."
+node "$REPO_ROOT/scripts/summarize.js" "$REPO_ROOT/metrics/gcp/$DATETIME"
+
 echo "==> All $ITERATIONS iteration(s) complete."

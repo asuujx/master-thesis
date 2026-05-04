@@ -34,7 +34,7 @@ ensure_pipeline() {
 
 cleanup() {
   echo "==> Destroying Azure infrastructure..."
-  tg destroy -auto-approve || true
+  tg destroy -auto-approve
 }
 trap cleanup EXIT
 
@@ -136,5 +136,8 @@ for i in $(seq 1 "$ITERATIONS"); do
   fi
   rm -rf "$TMP_DL"
 done
+
+echo "==> Generating summary..."
+node "$REPO_ROOT/scripts/summarize.js" "$REPO_ROOT/metrics/azure/$DATETIME"
 
 echo "==> All $ITERATIONS iteration(s) complete."
