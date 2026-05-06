@@ -36,6 +36,6 @@ variable "gcp_region" {
 }
 
 variable "node_machine_type" {
-  description = "Machine type for GKE worker nodes (e2-standard-2 ≈ t3.medium: 2 vCPU, 8 GB)."
+  description = "Machine type for GKE worker nodes (matched across clouds: 2 vCPU, 8 GB, Intel Ice Lake)."
   type        = string
 }
