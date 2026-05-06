@@ -17,15 +17,27 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
+      - date +%s > /tmp/install_start_epoch
       - npm ci
       - npx playwright install chromium --with-deps
+      - echo $(($(date +%s) - $(cat /tmp/install_start_epoch))) > /tmp/install_seconds
 
   build:
     commands:
+      - date +%s > /tmp/test_start_epoch
       - bash scripts/metrics/measure-rtt.sh "$BASE_URL"
       - npm run e2e
+      - echo $(($(date +%s) - $(cat /tmp/test_start_epoch))) > /tmp/test_seconds
 
   post_build:
     commands:
+      - mkdir -p results
+      - |
+        cat > results/runner_timings.json << EOF
+        {
+          "installSeconds": $(cat /tmp/install_seconds 2>/dev/null || echo 0),
+          "testSeconds": $(cat /tmp/test_seconds 2>/dev/null || echo 0)
+        }
+        EOF
       - aws s3 sync results/ s3://$ARTIFACTS_BUCKET/runs/$CODEBUILD_BUILD_ID/results/ --quiet || true
       - aws s3 sync test-results/ s3://$ARTIFACTS_BUCKET/runs/$CODEBUILD_BUILD_ID/test-results/ --quiet || true

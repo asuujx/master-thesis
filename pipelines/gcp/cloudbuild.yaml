@@ -5,10 +5,27 @@ steps:
     args:
       - '-c'
       - |
-        npm ci &&
-        npx playwright install chromium --with-deps &&
-        bash scripts/metrics/measure-rtt.sh "$BASE_URL" &&
+        set -e
+        INSTALL_START=$(date +%s)
+        npm ci
+        npx playwright install chromium --with-deps
+        INSTALL_END=$(date +%s)
+        bash scripts/metrics/measure-rtt.sh "$BASE_URL" || true
+        TEST_START=$(date +%s)
+        # Capture the e2e exit code but always succeed this step so the upload step still runs.
+        set +e
         npm run e2e
+        TEST_EXIT=$?
+        TEST_END=$(date +%s)
+        mkdir -p results
+        cat > results/runner_timings.json << EOF
+        {
+          "installSeconds": $((INSTALL_END - INSTALL_START)),
+          "testSeconds": $((TEST_END - TEST_START))
+        }
+        EOF
+        echo $TEST_EXIT > /workspace/test-exit-code
+        exit 0
     env:
       - 'CLOUD_PROVIDER=gcp'
       - 'ENVIRONMENT=gke'
@@ -21,12 +38,17 @@ steps:
       - 'LB_TYPE=$_LB_TYPE'
       - 'RUNNER_TYPE=$_RUNNER_TYPE'
 
-artifacts:
-  objects:
-    location: 'gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID'
-    paths:
-      - 'results/**/*'
-      - 'test-results/**/*'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'upload'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Always upload available artifacts — failures still produce useful diagnostic data.
+        gsutil -m cp -r results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/results/ 2>/dev/null || true
+        gsutil -m cp -r test-results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/test-results/ 2>/dev/null || true
+        # Propagate the original test exit code so build status reflects test result.
+        exit $(cat /workspace/test-exit-code 2>/dev/null || echo 1)
 
 options:
   logging: GCS_ONLY

@@ -24,14 +24,22 @@ pool:
 
 steps:
   - script: |
+      date +%s > /tmp/install_start_epoch
       npm ci
       npx playwright install chromium --with-deps
+      echo $(($(date +%s) - $(cat /tmp/install_start_epoch))) > /tmp/install_seconds
     displayName: Install dependencies
 
   - script: bash scripts/metrics/measure-rtt.sh "${{ parameters.baseUrl }}"
     displayName: Measure network RTT
 
-  - script: npm run e2e
+  - script: |
+      date +%s > /tmp/test_start_epoch
+      set +e
+      npm run e2e
+      TEST_EXIT=$?
+      echo $(($(date +%s) - $(cat /tmp/test_start_epoch))) > /tmp/test_seconds
+      exit $TEST_EXIT
     displayName: Run Playwright tests
     env:
       CLOUD_PROVIDER: azure
@@ -44,6 +52,17 @@ steps:
       CLUSTER_REGION: $(CLUSTER_REGION)
       LB_TYPE: $(LB_TYPE)
       RUNNER_TYPE: $(RUNNER_TYPE)
+
+  - script: |
+      mkdir -p results
+      cat > results/runner_timings.json << EOF
+      {
+        "installSeconds": $(cat /tmp/install_seconds 2>/dev/null || echo 0),
+        "testSeconds": $(cat /tmp/test_seconds 2>/dev/null || echo 0)
+      }
+      EOF
+    displayName: Write runner timings
+    condition: always()
 
   - script: |
       az storage blob upload-batch \
