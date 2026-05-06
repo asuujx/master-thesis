@@ -4,7 +4,7 @@ include "root" {
 
 inputs = {
   aws_region             = "eu-central-1"
-  node_instance_type     = "t3.medium"
+  node_instance_type     = "m6i.large"
   github_repo            = "https://github.com/asuujx/master-thesis"
   # github_token: pass as TF_VAR_github_token env var — never store secrets here
 }

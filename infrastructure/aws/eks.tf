@@ -60,8 +60,10 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "thesis-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids      = aws_subnet.private[*].id
+  # Pinned to a single AZ for parity with GCP zonal cluster and Azure single-zone default.
+  subnet_ids      = [aws_subnet.private[0].id]
   instance_types  = [var.node_instance_type]
+  disk_size       = 50
 
   scaling_config {
     desired_size = var.node_count
