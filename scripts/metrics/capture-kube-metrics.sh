@@ -39,8 +39,19 @@ pods_to_json() {
   done
 }
 
-NODES_OUT=$(kubectl top nodes --no-headers 2>/dev/null || true)
-PODS_OUT=$(kubectl top pods -A --no-headers 2>/dev/null || true)
+kubectl_top_with_retry() {
+  local args=("$@")
+  local out=""
+  for attempt in 1 2 3; do
+    out=$(kubectl top "${args[@]}" --no-headers 2>/dev/null || true)
+    [ -n "$out" ] && { echo "$out"; return; }
+    [ "$attempt" -lt 3 ] && echo "  kubectl top ${args[*]}: empty (attempt $attempt/3), retrying in 15s..." >&2 && sleep 15
+  done
+  echo "  WARNING: kubectl top ${args[*]} returned empty after 3 attempts" >&2
+}
+
+NODES_OUT=$(kubectl_top_with_retry nodes)
+PODS_OUT=$(kubectl_top_with_retry pods -A)
 
 NODES_JSON=$(echo "$NODES_OUT" | nodes_to_json)
 PODS_JSON=$(echo "$PODS_OUT" | pods_to_json)

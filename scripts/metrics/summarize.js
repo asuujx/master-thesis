@@ -86,7 +86,10 @@ for (const iterDir of iterDirs) {
   }
 }
 
-if (allRecords.length === 0) {
+// Drop non-test records (kube_metrics, network_rtt, etc. have no testName)
+const testRecords = allRecords.filter(r => typeof r.testName === 'string' && r.testName);
+
+if (testRecords.length === 0) {
   console.error('No test records found in any iteration directory');
   process.exit(1);
 }
@@ -95,7 +98,7 @@ if (allRecords.length === 0) {
 // With retries enabled each attempt writes its own record; we want the final outcome
 // for performance aggregation, while still counting flakiness separately.
 const byTest = {};
-for (const record of allRecords) {
+for (const record of testRecords) {
   const name    = record.testName;
   const iter    = record.iteration    ?? 1;
   const attempt = record.attemptNumber ?? 1;
@@ -106,8 +109,8 @@ for (const record of allRecords) {
   }
 }
 
-const cloud       = allRecords[0].cloud;
-const environment = allRecords[0].environment;
+const cloud       = testRecords[0].cloud;
+const environment = testRecords[0].environment;
 
 const tests = Object.entries(byTest).map(([testName, iterMap]) => {
   const finalAttempts = Object.values(iterMap);
