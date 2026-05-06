@@ -10,20 +10,70 @@ ITERATIONS="${ITERATIONS:-1}"
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
-# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/aws/eks.tf
+# Cluster metadata — read from terragrunt/root.hcl so metadata cannot drift from deployed config.
 K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_TYPE="t3.medium"
+NODE_COUNT=$(awk '/node_count/{print $3; exit}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE=$(awk -F'"' '/node_instance_type/{print $2}' "$TF_DIR/terragrunt.hcl")
 LB_TYPE="aws-classic-lb"
 RUNNER_TYPE="codebuild"
 
+# Convert ISO 8601 timestamp to Unix epoch seconds. Returns 0 on empty/invalid input.
+iso_to_epoch() {
+  [ -z "${1:-}" ] || [ "$1" = "None" ] && { echo 0; return; }
+  python3 -c "import sys,datetime; s=sys.argv[1].strip().replace('Z','+00:00'); print(int(datetime.datetime.fromisoformat(s).timestamp()) if s else 0)" "$1" 2>/dev/null || echo 0
+}
+
 cleanup() {
-  echo "==> Removing Kubernetes LoadBalancer service (releases ELB before VPC destroy)..."
-  # ELBs created by k8s services are outside Terraform state. If they still exist when
-  # terraform destroy runs, the VPC subnet deletion fails with a dependency error.
+  VPC_ID=$(tg output -raw vpc_id 2>/dev/null || true)
+
+  echo "==> Removing Kubernetes LoadBalancer service..."
   kubectl delete service frontend-external --ignore-not-found=true 2>/dev/null || true
-  echo "  Waiting 60s for ELB to be fully deprovisioned..."
-  sleep 60
+
+  # Poll until the ELB is fully gone rather than sleeping a fixed amount.
+  # Kubernetes creates the ELB and its security group outside Terraform state;
+  # both must be gone before terraform destroy can delete the VPC.
+  if [ -n "$VPC_ID" ]; then
+    echo "==> Waiting for ELB to deprovision (polling every 10s)..."
+    for i in $(seq 1 36); do
+      ELB_NAMES=$(aws elb describe-load-balancers \
+        --query "LoadBalancerDescriptions[?VPCId=='$VPC_ID'].LoadBalancerName" \
+        --output text 2>/dev/null || true)
+      [ -z "$ELB_NAMES" ] && echo "  ELB deprovisioned." && break
+      echo "  ELB still exists (attempt $i/36), force-deleting..."
+      for name in $ELB_NAMES; do
+        aws elb delete-load-balancer --load-balancer-name "$name" 2>/dev/null || true
+      done
+      sleep 10
+    done
+
+    echo "==> Cleaning up Kubernetes-managed security groups..."
+    SG_IDS=$(aws ec2 describe-security-groups \
+      --filters "Name=vpc-id,Values=$VPC_ID" \
+      --query 'SecurityGroups[?GroupName!=`default`].GroupId' \
+      --output text 2>/dev/null || true)
+    for sg in $SG_IDS; do
+      aws ec2 delete-security-group --group-id "$sg" 2>/dev/null || true
+      echo "  Deleted SG: $sg"
+    done
+
+    echo "==> Cleaning up orphaned ENIs..."
+    ENI_IDS=$(aws ec2 describe-network-interfaces \
+      --filters "Name=vpc-id,Values=$VPC_ID" \
+      --query 'NetworkInterfaces[*].NetworkInterfaceId' \
+      --output text 2>/dev/null || true)
+    for eni in $ENI_IDS; do
+      ATTACH_ID=$(aws ec2 describe-network-interfaces \
+        --network-interface-ids "$eni" \
+        --query 'NetworkInterfaces[0].Attachment.AttachmentId' \
+        --output text 2>/dev/null || true)
+      if [ -n "$ATTACH_ID" ] && [ "$ATTACH_ID" != "None" ]; then
+        aws ec2 detach-network-interface --attachment-id "$ATTACH_ID" --force 2>/dev/null || true
+        sleep 5
+      fi
+      aws ec2 delete-network-interface --network-interface-id "$eni" 2>/dev/null || true
+      echo "  Deleted ENI: $eni"
+    done
+  fi
 
   echo "==> Detaching persistent resources from state (IAM roles, S3, and CodeBuild project survive between runs)..."
   tg state rm aws_s3_bucket.artifacts          2>/dev/null || true
@@ -81,13 +131,15 @@ kubectl rollout status deployment/metrics-server -n kube-system --timeout=120s
 echo "==> Deploying app..."
 DEPLOY_START=$SECONDS
 kubectl apply -f "$REPO_ROOT/app/manifests/kubernetes-manifests.yaml"
+# LB_START captures Service object creation, when EKS begins ELB provisioning. This runs
+# in parallel with the deployment, so DEPLOY_DURATION and LB_DURATION overlap by design.
+LB_START=$SECONDS
 
 echo "==> Waiting for frontend deployment..."
 kubectl rollout status deployment/frontend --timeout=300s
 DEPLOY_DURATION=$((SECONDS - DEPLOY_START))
 
 echo "==> Waiting for LoadBalancer hostname (this can take 2-5 minutes on EKS)..."
-LB_START=$SECONDS
 HOSTNAME=""
 for i in $(seq 1 30); do
   HOSTNAME=$(kubectl get service frontend-external \
@@ -100,6 +152,9 @@ done
 LB_DURATION=$((SECONDS - LB_START))
 BASE_URL="http://$HOSTNAME"
 echo "==> App URL: $BASE_URL"
+
+echo "==> Waiting 30s for all pods to reach steady state..."
+sleep 30
 
 DATETIME=$(date +%Y-%m-%d_%H-%M-%S)
 SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -114,6 +169,7 @@ for i in $(seq 1 "$ITERATIONS"); do
     || echo "  WARNING: kube metrics capture failed"
 
   echo "==> Running test iteration $i/$ITERATIONS..."
+  SUBMIT_TS=$(date +%s)
   BUILD_ID=$(aws codebuild start-build \
     --project-name "$CODEBUILD_PROJECT" \
     --environment-variables-override \
@@ -137,6 +193,32 @@ for i in $(seq 1 "$ITERATIONS"); do
   done
 
   [ "$STATUS" != "SUCCEEDED" ] && echo "WARNING: iteration $i finished with status $STATUS"
+
+  # Capture runner queue/execution time from CodeBuild API. CodeBuild does not expose a "submit"
+  # timestamp, so we recorded it client-side in SUBMIT_TS before start-build. queue = start - submit;
+  # execution = end - start. Pipeline-side install/test timings are downloaded in runner_timings.json.
+  RUNNER_START_ISO=$(aws codebuild batch-get-builds --ids "$BUILD_ID" \
+    --query 'builds[0].startTime' --output text 2>/dev/null || echo "")
+  RUNNER_END_ISO=$(aws codebuild batch-get-builds --ids "$BUILD_ID" \
+    --query 'builds[0].endTime' --output text 2>/dev/null || echo "")
+  RUNNER_START=$(iso_to_epoch "$RUNNER_START_ISO")
+  RUNNER_END=$(iso_to_epoch "$RUNNER_END_ISO")
+  if [ "$RUNNER_START" -gt 0 ] && [ "$RUNNER_END" -gt 0 ]; then
+    RUNNER_QUEUE_SECONDS=$((RUNNER_START - SUBMIT_TS))
+    RUNNER_EXEC_SECONDS=$((RUNNER_END - RUNNER_START))
+  else
+    RUNNER_QUEUE_SECONDS=-1
+    RUNNER_EXEC_SECONDS=-1
+  fi
+  cat > "$METRICS_DIR/provider_timings.json" << TIMINGS_EOF
+{
+  "submitEpoch": $SUBMIT_TS,
+  "runnerStartIso": "$RUNNER_START_ISO",
+  "runnerEndIso": "$RUNNER_END_ISO",
+  "runnerQueueSeconds": $RUNNER_QUEUE_SECONDS,
+  "runnerExecutionSeconds": $RUNNER_EXEC_SECONDS
+}
+TIMINGS_EOF
 
   echo "==> Downloading metrics for iteration $i..."
   if aws s3 sync "s3://$BUCKET/runs/$BUILD_ID/results/" "$METRICS_DIR/" --region "$REGION"; then

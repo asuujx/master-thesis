@@ -13,14 +13,38 @@ ZONE="${REGION}-c"
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
-# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/gcp/gke.tf
+# Cluster metadata — read from terragrunt/root.hcl so metadata cannot drift from deployed config.
 K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_TYPE="e2-standard-2"
-LB_TYPE="gcp-https-lb"
+NODE_COUNT=$(awk '/node_count/{print $3; exit}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE=$(awk -F'"' '/node_machine_type/{print $2}' "$TF_DIR/terragrunt.hcl")
+LB_TYPE="gcp-network-lb"
 RUNNER_TYPE="cloud-build"
 
+# Convert ISO 8601 timestamp to Unix epoch seconds. Returns 0 on empty/invalid input.
+iso_to_epoch() {
+  [ -z "${1:-}" ] || [ "$1" = "None" ] && { echo 0; return; }
+  python3 -c "import sys,datetime; s=sys.argv[1].strip().replace('Z','+00:00'); print(int(datetime.datetime.fromisoformat(s).timestamp()) if s else 0)" "$1" 2>/dev/null || echo 0
+}
+
 cleanup() {
+  # Kubernetes creates GCP forwarding rules, target pools, health checks, and firewall rules
+  # outside Terraform state. They must be drained before tg destroy can delete the VPC.
+  echo "==> Removing Kubernetes LoadBalancer service..."
+  kubectl delete service frontend-external --ignore-not-found=true --timeout=120s 2>/dev/null || true
+
+  echo "==> Waiting for GCP forwarding rules to drain (polling every 10s)..."
+  # Filter to GKE-managed names so unrelated workloads in the project don't block the loop.
+  # Legacy L4 NLB: a<hex>. Newer GKE LBs: k8s-* / k8s2-*.
+  for i in $(seq 1 30); do
+    FWD_RULES=$(gcloud compute forwarding-rules list \
+      --project="$PROJECT" \
+      --filter="name~'^a[a-f0-9]+$' OR name~'^k8s'" \
+      --format="value(name)" 2>/dev/null || true)
+    [ -z "$FWD_RULES" ] && echo "  Forwarding rules drained." && break
+    echo "  still draining (attempt $i/30)..."
+    sleep 10
+  done
+
   echo "==> Destroying GCP infrastructure..."
   tg destroy -auto-approve
 }
@@ -60,13 +84,15 @@ kubectl wait --for=condition=Ready node --all --timeout=300s
 echo "==> Deploying app..."
 DEPLOY_START=$SECONDS
 kubectl apply -f "$REPO_ROOT/app/manifests/kubernetes-manifests.yaml"
+# LB_START captures Service object creation, when GKE begins LB provisioning. This runs
+# in parallel with the deployment, so DEPLOY_DURATION and LB_DURATION overlap by design.
+LB_START=$SECONDS
 
 echo "==> Waiting for frontend deployment..."
 kubectl rollout status deployment/frontend --timeout=300s
 DEPLOY_DURATION=$((SECONDS - DEPLOY_START))
 
 echo "==> Waiting for LoadBalancer IP..."
-LB_START=$SECONDS
 IP=""
 for i in $(seq 1 30); do
   IP=$(kubectl get service frontend-external \
@@ -79,6 +105,9 @@ done
 LB_DURATION=$((SECONDS - LB_START))
 BASE_URL="http://$IP"
 echo "==> App URL: $BASE_URL"
+
+echo "==> Waiting 30s for all pods to reach steady state..."
+sleep 30
 
 DATETIME=$(date +%Y-%m-%d_%H-%M-%S)
 SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -93,21 +122,55 @@ for i in $(seq 1 "$ITERATIONS"); do
     || echo "  WARNING: kube metrics capture failed"
 
   echo "==> Running test iteration $i/$ITERATIONS..."
-  if BUILD_ID=$(gcloud builds submit "$REPO_ROOT" \
+  SUBMIT_TS=$(date +%s)
+  BUILD_ID=$(gcloud builds submit "$REPO_ROOT" \
     --config="$REPO_ROOT/pipelines/gcp/cloudbuild.yaml" \
     --project="$PROJECT" \
     --region="$REGION" \
     --substitutions="_BASE_URL=$BASE_URL,_ITERATION=$i,_NODE_TYPE=$NODE_TYPE,_NODE_COUNT=$NODE_COUNT,_K8S_VERSION=$K8S_VERSION,_CLUSTER_REGION=$REGION,_LB_TYPE=$LB_TYPE,_RUNNER_TYPE=$RUNNER_TYPE" \
     --format="value(id)" \
-    --suppress-logs); then
-    STATUS="SUCCESS"
-  else
-    STATUS="FAILURE"
-  fi
+    --async)
   echo "  Build ID: $BUILD_ID"
-  echo "  Status: $STATUS"
+
+  STATUS="WORKING"
+  while [[ "$STATUS" == "WORKING" || "$STATUS" == "QUEUED" ]]; do
+    sleep 30
+    STATUS=$(gcloud builds describe "$BUILD_ID" \
+      --project="$PROJECT" --region="$REGION" \
+      --format="value(status)")
+    echo "  Status: $STATUS"
+  done
 
   [ "$STATUS" != "SUCCESS" ] && echo "WARNING: iteration $i finished with status $STATUS"
+
+  # Capture runner queue/execution time from Cloud Build API. createTime is when the build was
+  # queued; startTime is when a worker picked it up; finishTime is completion. Pipeline-side
+  # install/test timings are downloaded as part of runner_timings.json.
+  RUNNER_TIMES=$(gcloud builds describe "$BUILD_ID" --project="$PROJECT" --region="$REGION" \
+    --format="value(createTime,startTime,finishTime)" 2>/dev/null || echo "")
+  RUNNER_CREATE_ISO=$(echo "$RUNNER_TIMES" | awk -F'\t' '{print $1}')
+  RUNNER_START_ISO=$(echo "$RUNNER_TIMES" | awk -F'\t' '{print $2}')
+  RUNNER_END_ISO=$(echo "$RUNNER_TIMES" | awk -F'\t' '{print $3}')
+  RUNNER_CREATE=$(iso_to_epoch "$RUNNER_CREATE_ISO")
+  RUNNER_START=$(iso_to_epoch "$RUNNER_START_ISO")
+  RUNNER_END=$(iso_to_epoch "$RUNNER_END_ISO")
+  if [ "$RUNNER_START" -gt 0 ] && [ "$RUNNER_END" -gt 0 ] && [ "$RUNNER_CREATE" -gt 0 ]; then
+    RUNNER_QUEUE_SECONDS=$((RUNNER_START - RUNNER_CREATE))
+    RUNNER_EXEC_SECONDS=$((RUNNER_END - RUNNER_START))
+  else
+    RUNNER_QUEUE_SECONDS=-1
+    RUNNER_EXEC_SECONDS=-1
+  fi
+  cat > "$METRICS_DIR/provider_timings.json" << TIMINGS_EOF
+{
+  "submitEpoch": $SUBMIT_TS,
+  "runnerCreateIso": "$RUNNER_CREATE_ISO",
+  "runnerStartIso": "$RUNNER_START_ISO",
+  "runnerEndIso": "$RUNNER_END_ISO",
+  "runnerQueueSeconds": $RUNNER_QUEUE_SECONDS,
+  "runnerExecutionSeconds": $RUNNER_EXEC_SECONDS
+}
+TIMINGS_EOF
 
   echo "==> Downloading metrics for iteration $i..."
   GCS_CONTENTS=$(gsutil ls -r "gs://$BUCKET/runs/$BUILD_ID/" 2>/dev/null || true)

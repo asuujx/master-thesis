@@ -18,12 +18,21 @@ az devops configure --defaults \
 
 tg() { (cd "$TF_DIR" && terragrunt "$@"); }
 
-# Cluster metadata — mirrors infrastructure/root.hcl and infrastructure/azure/aks.tf
+# Cluster metadata — read from terragrunt/root.hcl so metadata cannot drift from deployed config.
 K8S_VERSION=$(awk -F'"' '/k8s_version/{print $2}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_COUNT=$(awk '/node_count/{print $3}' "$REPO_ROOT/infrastructure/root.hcl")
-NODE_TYPE="Standard_D2ads_v5"
+NODE_COUNT=$(awk '/node_count/{print $3; exit}' "$REPO_ROOT/infrastructure/root.hcl")
+NODE_TYPE=$(awk -F'"' '/node_vm_size/{print $2}' "$TF_DIR/terragrunt.hcl")
+SUB=$(awk -F'"' '/subscription_id/{print $2}' "$TF_DIR/terragrunt.hcl")
+STORAGE_SUFFIX=$(awk -F'"' '/storage_suffix/{print $2}' "$TF_DIR/terragrunt.hcl")
+AZURE_REGION=$(awk -F'"' '/azure_region/{print $2}' "$TF_DIR/terragrunt.hcl")
 LB_TYPE="azure-lb"
 RUNNER_TYPE="azure-pipelines"
+
+# Convert ISO 8601 timestamp to Unix epoch seconds. Returns 0 on empty/invalid input.
+iso_to_epoch() {
+  [ -z "${1:-}" ] || [ "$1" = "None" ] && { echo 0; return; }
+  python3 -c "import sys,datetime; s=sys.argv[1].strip().replace('Z','+00:00'); print(int(datetime.datetime.fromisoformat(s).timestamp()) if s else 0)" "$1" 2>/dev/null || echo 0
+}
 
 ensure_pipeline() {
   if az pipelines show --name "$PIPELINE_NAME" --output none 2>/dev/null; then
@@ -40,18 +49,31 @@ ensure_pipeline() {
 }
 
 cleanup() {
+  # AKS LoadBalancer service creates resources in the auto-managed node resource group.
+  # Drain the Service first so destroy doesn't race against it.
+  echo "==> Removing Kubernetes LoadBalancer service..."
+  kubectl delete service frontend-external --ignore-not-found=true --timeout=120s 2>/dev/null || true
+
   echo "==> Destroying Azure infrastructure..."
   tg destroy -auto-approve
+
+  # Defensive: AKS normally deletes its node RG with the cluster, but if destroy timed out
+  # or the LB had a stuck finalizer, the node RG can leak with a Standard LB + Public IP attached.
+  NODE_RG="MC_thesis-rg_thesis-cluster_${AZURE_REGION}"
+  if az group show --name "$NODE_RG" --output none 2>/dev/null; then
+    echo "==> Removing orphaned AKS node resource group $NODE_RG..."
+    az group delete --name "$NODE_RG" --yes --no-wait 2>/dev/null || true
+  fi
 }
 trap cleanup EXIT
-
-SUB="76287223-e5f3-4a6e-8897-3f42dac962d7"
-STORAGE_SUFFIX="pb01"
 
 try_import() {
   tg import "$1" "$2" 2>/dev/null \
     && echo "  reconciled: $1" || true
 }
+
+echo "==> Validating Azure DevOps pipeline exists (fail-fast before provisioning)..."
+ensure_pipeline
 
 echo "==> Initializing Terragrunt..."
 tg init -input=false
@@ -89,13 +111,15 @@ kubectl wait --for=condition=Ready node --all --timeout=300s
 echo "==> Deploying app..."
 DEPLOY_START=$SECONDS
 kubectl apply -f "$REPO_ROOT/app/manifests/kubernetes-manifests.yaml"
+# LB_START captures Service object creation, when AKS begins LB provisioning. This runs
+# in parallel with the deployment, so DEPLOY_DURATION and LB_DURATION overlap by design.
+LB_START=$SECONDS
 
 echo "==> Waiting for frontend deployment..."
 kubectl rollout status deployment/frontend --timeout=300s
 DEPLOY_DURATION=$((SECONDS - DEPLOY_START))
 
 echo "==> Waiting for LoadBalancer IP..."
-LB_START=$SECONDS
 IP=""
 for i in $(seq 1 30); do
   IP=$(kubectl get service frontend-external \
@@ -109,7 +133,8 @@ LB_DURATION=$((SECONDS - LB_START))
 BASE_URL="http://$IP"
 echo "==> App URL: $BASE_URL"
 
-ensure_pipeline
+echo "==> Waiting 30s for all pods to reach steady state..."
+sleep 30
 
 DATETIME=$(date +%Y-%m-%d_%H-%M-%S)
 SUITE_START_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -124,12 +149,13 @@ for i in $(seq 1 "$ITERATIONS"); do
     || echo "  WARNING: kube metrics capture failed"
 
   echo "==> Running test iteration $i/$ITERATIONS..."
+  SUBMIT_TS=$(date +%s)
   RUN_ID=$(az pipelines run \
     --name "$PIPELINE_NAME" \
     --parameters "baseUrl=$BASE_URL" "iteration=$i" \
     --variables "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT" "STORAGE_ACCOUNT_KEY=$STORAGE_KEY" \
       "NODE_TYPE=$NODE_TYPE" "NODE_COUNT=$NODE_COUNT" "K8S_VERSION=$K8S_VERSION" \
-      "CLUSTER_REGION=germanywestcentral" "LB_TYPE=$LB_TYPE" "RUNNER_TYPE=$RUNNER_TYPE" \
+      "CLUSTER_REGION=$AZURE_REGION" "LB_TYPE=$LB_TYPE" "RUNNER_TYPE=$RUNNER_TYPE" \
     --query "id" --output tsv)
   echo "  Pipeline run ID: $RUN_ID"
 
@@ -142,6 +168,33 @@ for i in $(seq 1 "$ITERATIONS"); do
 
   RESULT=$(az pipelines runs show --id "$RUN_ID" --query "result" --output tsv)
   [ "$RESULT" != "succeeded" ] && echo "WARNING: iteration $i finished with result $RESULT"
+
+  # Capture runner queue/execution time from Azure Pipelines API. queueTime = when run was queued;
+  # startTime = when an agent picked it up; finishTime = completion. Pipeline-side install/test
+  # timings are downloaded as part of runner_timings.json.
+  RUNNER_QUEUE_ISO=$(az pipelines runs show --id "$RUN_ID" --query "queueTime" --output tsv 2>/dev/null || echo "")
+  RUNNER_START_ISO=$(az pipelines runs show --id "$RUN_ID" --query "startTime" --output tsv 2>/dev/null || echo "")
+  RUNNER_END_ISO=$(az pipelines runs show --id "$RUN_ID" --query "finishTime" --output tsv 2>/dev/null || echo "")
+  RUNNER_QUEUE=$(iso_to_epoch "$RUNNER_QUEUE_ISO")
+  RUNNER_START=$(iso_to_epoch "$RUNNER_START_ISO")
+  RUNNER_END=$(iso_to_epoch "$RUNNER_END_ISO")
+  if [ "$RUNNER_START" -gt 0 ] && [ "$RUNNER_END" -gt 0 ] && [ "$RUNNER_QUEUE" -gt 0 ]; then
+    RUNNER_QUEUE_SECONDS=$((RUNNER_START - RUNNER_QUEUE))
+    RUNNER_EXEC_SECONDS=$((RUNNER_END - RUNNER_START))
+  else
+    RUNNER_QUEUE_SECONDS=-1
+    RUNNER_EXEC_SECONDS=-1
+  fi
+  cat > "$METRICS_DIR/provider_timings.json" << TIMINGS_EOF
+{
+  "submitEpoch": $SUBMIT_TS,
+  "runnerQueueIso": "$RUNNER_QUEUE_ISO",
+  "runnerStartIso": "$RUNNER_START_ISO",
+  "runnerEndIso": "$RUNNER_END_ISO",
+  "runnerQueueSeconds": $RUNNER_QUEUE_SECONDS,
+  "runnerExecutionSeconds": $RUNNER_EXEC_SECONDS
+}
+TIMINGS_EOF
 
   echo "==> Downloading metrics for iteration $i..."
   TMP_DL=$(mktemp -d)
@@ -177,7 +230,7 @@ cat > "$REPO_ROOT/metrics/azure/$DATETIME/run_metadata.json" << METADATA_EOF
   "nodeType": "$NODE_TYPE",
   "nodeCount": $NODE_COUNT,
   "k8sVersion": "$K8S_VERSION",
-  "clusterRegion": "germanywestcentral",
+  "clusterRegion": "$AZURE_REGION",
   "lbType": "$LB_TYPE",
   "runnerType": "$RUNNER_TYPE",
   "iterationCount": $ITERATIONS,
