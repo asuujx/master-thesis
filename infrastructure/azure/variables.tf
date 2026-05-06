@@ -36,7 +36,7 @@ variable "azure_region" {
 }
 
 variable "node_vm_size" {
-  description = "VM size for AKS worker nodes (Standard_D2s_v3 ≈ e2-standard-2: 2 vCPU, 8 GB)."
+  description = "VM size for AKS worker nodes (matched across clouds: 2 vCPU, 8 GB, Intel Ice Lake)."
   type        = string
 }
 

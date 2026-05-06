@@ -24,6 +24,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     node_count                  = var.node_count
     vm_size                     = var.node_vm_size
     vnet_subnet_id              = azurerm_subnet.nodes.id
+    os_disk_size_gb             = 50
     temporary_name_for_rotation = "tmppool"
   }
 
@@ -32,9 +33,10 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   network_profile {
-    network_plugin = "kubenet"
-    pod_cidr       = var.pod_cidr
-    service_cidr   = var.service_cidr
-    dns_service_ip = cidrhost(var.service_cidr, 10)
+    network_plugin      = "azure"
+    network_plugin_mode = "overlay"
+    pod_cidr            = var.pod_cidr
+    service_cidr        = var.service_cidr
+    dns_service_ip      = cidrhost(var.service_cidr, 10)
   }
 }
