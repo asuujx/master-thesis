@@ -6,6 +6,24 @@ parameters:
     displayName: 'Iteration number'
     type: string
     default: '1'
+  - name: nodeType
+    type: string
+    default: 'Standard_D2s_v4'
+  - name: nodeCount
+    type: string
+    default: '2'
+  - name: k8sVersion
+    type: string
+    default: '1.35'
+  - name: clusterRegion
+    type: string
+    default: 'germanywestcentral'
+  - name: lbType
+    type: string
+    default: 'azure-lb'
+  - name: runnerType
+    type: string
+    default: 'azure-pipelines'
 
 trigger: none
 
@@ -46,12 +64,12 @@ steps:
       ENVIRONMENT: aks
       BASE_URL: ${{ parameters.baseUrl }}
       ITERATION: ${{ parameters.iteration }}
-      NODE_TYPE: $(NODE_TYPE)
-      NODE_COUNT: $(NODE_COUNT)
-      K8S_VERSION: $(K8S_VERSION)
-      CLUSTER_REGION: $(CLUSTER_REGION)
-      LB_TYPE: $(LB_TYPE)
-      RUNNER_TYPE: $(RUNNER_TYPE)
+      NODE_TYPE: ${{ parameters.nodeType }}
+      NODE_COUNT: ${{ parameters.nodeCount }}
+      K8S_VERSION: ${{ parameters.k8sVersion }}
+      CLUSTER_REGION: ${{ parameters.clusterRegion }}
+      LB_TYPE: ${{ parameters.lbType }}
+      RUNNER_TYPE: ${{ parameters.runnerType }}
 
   - script: |
       mkdir -p results
