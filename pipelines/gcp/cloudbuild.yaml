@@ -10,7 +10,7 @@ steps:
         npm ci
         npx playwright install chromium --with-deps
         INSTALL_END=$(date +%s)
-        bash scripts/metrics/measure-rtt.sh "$BASE_URL" || true
+        bash scripts/metrics/measure-rtt.sh "$$BASE_URL" || true
         TEST_START=$(date +%s)
         # Capture the e2e exit code but always succeed this step so the upload step still runs.
         set +e
@@ -24,7 +24,7 @@ steps:
           "testSeconds": $((TEST_END - TEST_START))
         }
         EOF
-        echo $TEST_EXIT > /workspace/test-exit-code
+        echo $$TEST_EXIT > /workspace/test-exit-code
         exit 0
     env:
       - 'CLOUD_PROVIDER=gcp'
