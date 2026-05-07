@@ -198,16 +198,34 @@ TIMINGS_EOF
 
   echo "==> Downloading metrics for iteration $i..."
   TMP_DL=$(mktemp -d)
-  if az storage blob download-batch \
-       --account-name "$STORAGE_ACCOUNT" \
-       --account-key "$STORAGE_KEY" \
-       --source artifacts \
-       --destination "$TMP_DL" \
-       --pattern "runs/$RUN_ID/results/*"; then
+  BLOB_NAMES=$(az storage blob list \
+    --account-name "$STORAGE_ACCOUNT" \
+    --account-key "$STORAGE_KEY" \
+    --container-name artifacts \
+    --prefix "runs/$RUN_ID/" \
+    --query "[?ends_with(name, '.json')].name" \
+    --output tsv 2>/dev/null || true)
+  if [ -n "$BLOB_NAMES" ]; then
+    while IFS= read -r blob; do
+      az storage blob download \
+        --account-name "$STORAGE_ACCOUNT" \
+        --account-key "$STORAGE_KEY" \
+        --container-name artifacts \
+        --name "$blob" \
+        --file "$TMP_DL/$(basename "$blob")" \
+        --no-progress --overwrite 2>/dev/null || true
+    done <<< "$BLOB_NAMES"
     find "$TMP_DL" -name "*.json" -exec cp {} "$METRICS_DIR/" \;
     echo "  Saved to $METRICS_DIR ($(find "$METRICS_DIR" -name '*.json' | wc -l | tr -d ' ') file(s))"
   else
-    echo "  WARNING: metrics download failed — check storage account $STORAGE_ACCOUNT, container artifacts"
+    ALL_BLOBS=$(az storage blob list \
+      --account-name "$STORAGE_ACCOUNT" \
+      --account-key "$STORAGE_KEY" \
+      --container-name artifacts \
+      --prefix "runs/$RUN_ID/" \
+      --query "[].name" --output tsv 2>/dev/null || true)
+    echo "  WARNING: no JSON blobs found under runs/$RUN_ID/ in storage account $STORAGE_ACCOUNT"
+    echo "  All blobs at that prefix: ${ALL_BLOBS:-<none>}"
   fi
   rm -rf "$TMP_DL"
 
