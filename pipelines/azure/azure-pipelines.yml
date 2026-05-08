@@ -24,14 +24,14 @@ parameters:
   - name: runnerType
     type: string
     default: 'azure-pipelines'
+  - name: storageAccountName
+    type: string
+    default: ''
+  - name: storageAccountKey
+    type: string
+    default: ''
 
 trigger: none
-
-variables:
-  - name: STORAGE_ACCOUNT_NAME
-    value: ''
-  - name: STORAGE_ACCOUNT_KEY
-    value: ''
 
 # Microsoft-hosted agents do not support region selection — the runner may be in West Europe (Amsterdam)
 # rather than germanywestcentral where the AKS cluster resides. This introduces ~5-10 ms extra latency
@@ -84,15 +84,15 @@ steps:
 
   - script: |
       az storage blob upload-batch \
-        --account-name $(STORAGE_ACCOUNT_NAME) \
-        --account-key $(STORAGE_ACCOUNT_KEY) \
+        --account-name "${{ parameters.storageAccountName }}" \
+        --account-key "${{ parameters.storageAccountKey }}" \
         --destination artifacts \
         --destination-path "runs/$(Build.BuildId)" \
         --source . \
         --pattern "results/**" || true
       az storage blob upload-batch \
-        --account-name $(STORAGE_ACCOUNT_NAME) \
-        --account-key $(STORAGE_ACCOUNT_KEY) \
+        --account-name "${{ parameters.storageAccountName }}" \
+        --account-key "${{ parameters.storageAccountKey }}" \
         --destination artifacts \
         --destination-path "runs/$(Build.BuildId)" \
         --source . \

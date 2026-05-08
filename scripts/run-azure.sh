@@ -155,7 +155,7 @@ for i in $(seq 1 "$ITERATIONS"); do
     --parameters "baseUrl=$BASE_URL" "iteration=$i" \
       "nodeType=$NODE_TYPE" "nodeCount=$NODE_COUNT" "k8sVersion=$K8S_VERSION" \
       "clusterRegion=$AZURE_REGION" "lbType=$LB_TYPE" "runnerType=$RUNNER_TYPE" \
-    --variables "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT" "STORAGE_ACCOUNT_KEY=$STORAGE_KEY" \
+      "storageAccountName=$STORAGE_ACCOUNT" "storageAccountKey=$STORAGE_KEY" \
     --query "id" --output tsv)
   echo "  Pipeline run ID: $RUN_ID"
 
