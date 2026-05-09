@@ -1,0 +1,7 @@
+[
+  {"probe":1,"dnsSeconds":0.007955,"tcpSeconds":0.009861,"ttfbSeconds":0.025855,"totalSeconds":0.025994,"httpCode":"200"},
+  {"probe":2,"dnsSeconds":0.000835,"tcpSeconds":0.001835,"ttfbSeconds":0.019195,"totalSeconds":0.019412,"httpCode":"200"},
+  {"probe":3,"dnsSeconds":0.000499,"tcpSeconds":0.001667,"ttfbSeconds":0.015828,"totalSeconds":0.015901,"httpCode":"200"},
+  {"probe":4,"dnsSeconds":0.000470,"tcpSeconds":0.001293,"ttfbSeconds":0.036763,"totalSeconds":0.036919,"httpCode":"200"},
+  {"probe":5,"dnsSeconds":0.000660,"tcpSeconds":0.001857,"ttfbSeconds":0.016024,"totalSeconds":0.016254,"httpCode":"200"}
+]

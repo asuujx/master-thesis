@@ -1,0 +1,17 @@
+{
+  "cloud": "aws",
+  "environment": "eks",
+  "nodeType": "m5.large",
+  "nodeCount": 2,
+  "k8sVersion": "1.35",
+  "clusterRegion": "eu-central-1",
+  "lbType": "aws-classic-lb",
+  "runnerType": "codebuild",
+  "iterationCount": 30,
+  "suiteStartUtc": "2026-05-09T19:32:06Z",
+  "suiteEndUtc": "2026-05-09T20:47:01Z",
+  "infrastructureProvisioningSeconds": 569,
+  "appDeploySeconds": 26,
+  "lbReadySeconds": 23,
+  "totalTestSuiteDurationSeconds": 4495
+}
