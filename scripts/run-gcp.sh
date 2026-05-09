@@ -59,16 +59,33 @@ try_import() {
   tg import "$1" "$2" 2>/dev/null \
     && echo "  reconciled: $1" || true
 }
-echo "==> Reconciling pre-existing GCP resources..."
-try_import google_storage_bucket.artifacts    "thesis-test-artifacts-${PROJECT}"
-try_import google_compute_network.main        "projects/${PROJECT}/global/networks/thesis-vpc"
-try_import google_compute_subnetwork.main     "projects/${PROJECT}/regions/${REGION}/subnetworks/thesis-subnet"
-try_import google_container_cluster.main      "projects/${PROJECT}/locations/${ZONE}/clusters/thesis-cluster"
-try_import google_container_node_pool.main    "projects/${PROJECT}/locations/${ZONE}/clusters/thesis-cluster/nodePools/thesis-nodes"
+
+reconcile_resources() {
+  echo "==> Reconciling pre-existing GCP resources..."
+  try_import google_storage_bucket.artifacts    "thesis-test-artifacts-${PROJECT}"
+  try_import google_compute_network.main        "projects/${PROJECT}/global/networks/thesis-vpc"
+  try_import google_compute_subnetwork.main     "projects/${PROJECT}/regions/${REGION}/subnetworks/thesis-subnet"
+  try_import google_container_cluster.main      "projects/${PROJECT}/locations/${ZONE}/clusters/thesis-cluster"
+  try_import google_container_node_pool.main    "projects/${PROJECT}/locations/${ZONE}/clusters/thesis-cluster/nodePools/thesis-nodes"
+}
+
+reconcile_resources
 
 echo "==> Provisioning GCP infrastructure..."
 PROVISION_START=$SECONDS
-tg apply -auto-approve -input=false
+# Retry apply on transient connection failures (http2 drops after long node pool creation).
+# Re-import before each retry so resources created during the failed attempt are reconciled.
+APPLY_ATTEMPTS=3
+for attempt in $(seq 1 $APPLY_ATTEMPTS); do
+  [ "$attempt" -gt 1 ] && { echo "  Retrying apply (attempt $attempt/$APPLY_ATTEMPTS)..."; reconcile_resources; }
+  tg apply -auto-approve -input=false && break
+  if [ "$attempt" -eq "$APPLY_ATTEMPTS" ]; then
+    echo "ERROR: provisioning failed after $APPLY_ATTEMPTS attempts"
+    exit 1
+  fi
+  echo "  Apply failed, waiting 30s before retry..."
+  sleep 30
+done
 PROVISION_DURATION=$((SECONDS - PROVISION_START))
 
 CLUSTER=$(tg output -raw gke_cluster_name)

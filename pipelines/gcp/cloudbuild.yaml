@@ -43,8 +43,7 @@ steps:
     args:
       - '-c'
       - |
-        # Measure network RTT here — cloud-sdk:slim has curl; the node:20 container does not.
-        bash scripts/metrics/measure-rtt.sh "$_BASE_URL" || true
+        bash scripts/metrics/measure-rtt.sh "$_BASE_URL" || echo "WARNING: measure-rtt.sh failed"
         # Always upload available artifacts — failures still produce useful diagnostic data.
         gsutil -m cp -r results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/results/ 2>/dev/null || true
         gsutil -m cp -r test-results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/test-results/ 2>/dev/null || true
@@ -52,4 +51,4 @@ steps:
         exit $(cat /workspace/test-exit-code 2>/dev/null || echo 1)
 
 options:
-  logging: GCS_ONLY
+  logging: CLOUD_LOGGING_ONLY
