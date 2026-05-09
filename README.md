@@ -1,12 +1,13 @@
 # Master Thesis — Multi-Cloud Playwright Performance Testing
 
-Automated Playwright e2e test suite run against Google Online Boutique deployed on Kubernetes across AWS (EKS), GCP (GKE), Azure (AKS), and locally via Docker Compose. Each run collects per-test performance metrics (FCP, LCP, TTFB, load time) stored in `results/<cloud>_<env>.json`.
+Automated Playwright e2e test suite run against Google Online Boutique deployed on Kubernetes across AWS (EKS), GCP (GKE), Azure (AKS), and locally via Docker Compose. Each run collects per-iteration metrics: Playwright web vitals, Kubernetes resource usage, network RTT, and CI runner timings — stored under `metrics/<cloud>/<datetime>/`.
 
 ---
 
 ## Local
 
 ### Prerequisites
+
 - Docker Desktop
 - Node.js 20+
 
@@ -18,173 +19,56 @@ npx playwright install chromium --with-deps
 npm run e2e
 ```
 
-Results saved to `results/local_local.json`.
-
 ---
 
-## AWS (EKS + CodeBuild)
+## Cloud runs (AWS / GCP / Azure)
 
-### Prerequisites
-- AWS CLI configured (`aws configure`)
+Each cloud has a self-contained script that provisions infrastructure, deploys the app, runs N test iterations, collects metrics, and tears everything down.
+
+### Prerequisites (all clouds)
+
+- Node.js 20+
+- [Terragrunt](https://terragrunt.gruntwork.io/) (`brew install terragrunt`)
 - kubectl
-- Terraform >= 1.5
 
-### 1. Provision infrastructure
+### AWS (EKS + CodeBuild)
+
+Additional prerequisites: AWS CLI configured (`aws configure`)
 
 ```bash
-cd infrastructure/aws
-cp terraform.tfvars.example terraform.tfvars
-# edit terraform.tfvars — set github_repo
-
+# First run: set GitHub token so CodeBuild can pull the repo
 export TF_VAR_github_token="github_pat_..."
-terraform init
-terraform apply
+
+ITERATIONS=30 ./scripts/run-aws.sh
 ```
 
-### 2. Connect kubectl to EKS
+### GCP (GKE + Cloud Build)
+
+Additional prerequisites:
+
+- `gcloud auth login && gcloud auth application-default login`
+- `gcloud components install gke-gcloud-auth-plugin`
 
 ```bash
-aws eks update-kubeconfig --region eu-central-1 --name thesis-cluster
+ITERATIONS=30 ./scripts/run-gcp.sh
 ```
 
-### 3. Deploy the app
+### Azure (AKS + Azure Pipelines)
+
+Additional prerequisites:
+
+- `az login`
+- `az extension add --name azure-devops`
 
 ```bash
-kubectl apply -f app/manifests/kubernetes-manifests.yaml
+# First run only: GitHub PAT to create the Azure Pipelines pipeline
+# Required scopes: repo, admin:repo_hook, user
+export AZURE_DEVOPS_EXT_GITHUB_PAT="github_pat_..."
 
-# wait for LoadBalancer hostname (~2 min)
-kubectl get service frontend-external --watch
+ITERATIONS=30 ./scripts/run-azure.sh
 ```
 
-### 4. Run tests
-
-```bash
-aws codebuild start-build \
-  --project-name thesis-playwright-tests \
-  --environment-variables-override \
-    name=BASE_URL,value=http://<elb-hostname>,type=PLAINTEXT \
-    name=ITERATION,value=1,type=PLAINTEXT
-```
-
-### 5. Tear down
-
-```bash
-kubectl delete -f app/manifests/kubernetes-manifests.yaml
-cd infrastructure/aws && terraform destroy
-```
-
----
-
-## GCP (GKE + Cloud Build)
-
-### Prerequisites
-- gcloud CLI (`gcloud auth login && gcloud auth application-default login`)
-- gke-gcloud-auth-plugin (`gcloud components install gke-gcloud-auth-plugin`)
-- kubectl
-- Terraform >= 1.5
-
-### 1. Provision infrastructure
-
-```bash
-cd infrastructure/gcp
-terraform init
-terraform apply
-# uses terraform.tfvars — project_id, github_owner, github_repo_name already set
-```
-
-### 2. Connect kubectl to GKE
-
-```bash
-gcloud container clusters get-credentials thesis-cluster \
-  --zone europe-west3-c \
-  --project thesis-playwright-gcp
-```
-
-### 3. Deploy the app
-
-```bash
-kubectl apply -f app/manifests/kubernetes-manifests.yaml
-
-# wait for LoadBalancer IP (~2 min)
-kubectl get service frontend-external --watch
-```
-
-### 4. Run tests
-
-```bash
-# run from repo root
-gcloud builds submit . \
-  --config=pipelines/gcp/cloudbuild.yaml \
-  --region=europe-west3 \
-  --substitutions "_BASE_URL=http://<frontend-ip>,_ITERATION=1"
-```
-
-### 5. Tear down
-
-```bash
-kubectl delete -f app/manifests/kubernetes-manifests.yaml
-cd infrastructure/gcp && terraform destroy
-```
-
----
-
-## Azure (AKS + Azure Pipelines)
-
-### Prerequisites
-
-- Azure CLI (`az login`)
-- kubectl
-- Terraform >= 1.5
-- Azure DevOps organization ([dev.azure.com](https://dev.azure.com))
-
-### 1. Provision infrastructure
-
-```bash
-cd infrastructure/azure
-# edit terraform.tfvars — set subscription_id
-terraform init
-terraform apply
-```
-
-### 2. Connect kubectl to AKS
-
-```bash
-az aks get-credentials --resource-group thesis-rg --name thesis-cluster
-```
-
-### 3. Deploy the app
-
-```bash
-kubectl apply -f app/manifests/kubernetes-manifests.yaml
-
-# wait for LoadBalancer IP (~2 min)
-kubectl get service frontend-external --watch
-```
-
-### 4. Set up Azure Pipelines (first time only)
-
-1. Go to `https://dev.azure.com/<your-org>` → create project `thesis`
-2. **Pipelines → New pipeline → GitHub** → select this repo
-3. Choose **Existing Azure Pipelines YAML file**, path: `/pipelines/azure/azure-pipelines.yml`
-4. Save (do not run yet)
-5. Add pipeline variables:
-   - `STORAGE_ACCOUNT_NAME` = output of `terraform output -raw artifacts_storage_account`
-   - `STORAGE_ACCOUNT_KEY` = output of `terraform output -raw storage_account_key` (mark as secret)
-
-### 5. Run tests
-
-```bash
-az devops configure --defaults organization=https://dev.azure.com/<your-org> project=thesis
-az pipelines run --name thesis-playwright-tests \
-  --parameters baseUrl=http://<frontend-ip> iteration=1
-```
-
-### 6. Tear down
-
-```bash
-kubectl delete -f app/manifests/kubernetes-manifests.yaml
-cd infrastructure/azure && terraform destroy
-```
+Azure DevOps org: `balon-thesis`, project: `thesis`.
 
 ---
 
@@ -192,18 +76,38 @@ cd infrastructure/azure && terraform destroy
 
 | | AWS | GCP | Azure |
 | --- | --- | --- | --- |
-| Kubernetes | EKS 1.32 (eu-central-1) | GKE 1.32 zonal (europe-west3-c) | AKS 1.32 (germanywestcentral) |
-| Nodes | 2× t3.medium (2 vCPU, 4 GB) | 2× e2-standard-2 (2 vCPU, 8 GB) | 2× Standard_DC2ads_v5 (2 vCPU, 8 GB) |
+| Kubernetes | EKS 1.35 (eu-central-1) | GKE 1.35 zonal (europe-west3-c) | AKS 1.35 (germanywestcentral) |
+| Nodes | 2× m5.large (2 vCPU, 8 GB) | 2× n2-standard-2 (2 vCPU, 8 GB) | 2× Standard_D2s_v4 (2 vCPU, 8 GB) |
 | CI runner | CodeBuild (eu-central-1) | Cloud Build (europe-west3) | Azure Pipelines (West Europe†) |
 | Artifacts | S3 | GCS | Azure Blob Storage |
 | Pipeline file | `pipelines/aws/buildspec.yml` | `pipelines/gcp/cloudbuild.yaml` | `pipelines/azure/azure-pipelines.yml` |
 
 † Microsoft-hosted agents do not support region selection — runner may be in West Europe (Amsterdam) rather than germanywestcentral. See thesis limitations.
 
-## Results
+---
 
-Test results accumulate in `results/<cloud>_<env>.json` on each run:
-- `results/local_local.json`
-- `results/aws_eks.json`
-- `results/gcp_gke.json`
-- `results/azure_aks.json`
+## Metrics structure
+
+Each cloud run writes to `metrics/<cloud>/<datetime>/`:
+
+```text
+metrics/aws/2026-05-09_21-32-06/
+  run_metadata.json           # cloud, node type, iteration count, provisioning/deploy durations
+  iteration-1/
+    aws_eks.json              # Playwright web vitals (FCP, LCP, TTFB, load time) per test
+    network_rtt.json          # 5 curl probes from CI runner to LoadBalancer
+    kube_metrics_before.json  # kubectl top nodes/pods snapshot before the test run
+    kube_metrics_after.json   # kubectl top nodes/pods snapshot after the test run
+    provider_timings.json     # CI runner queue time and execution time
+    runner_timings.json       # pipeline-side install and test phase durations
+  iteration-2/
+    ...
+  summary.json                # aggregated stats across all iterations
+```
+
+Scripts that produce these files:
+
+- `scripts/run-aws.sh` / `scripts/run-gcp.sh` / `scripts/run-azure.sh` — orchestrate the full run
+- `scripts/metrics/capture-kube-metrics.sh` — kubectl top snapshots
+- `scripts/metrics/measure-rtt.sh` — network RTT probes
+- `scripts/metrics/summarize.js` — per-run summary aggregation
