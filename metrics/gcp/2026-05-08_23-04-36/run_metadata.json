@@ -1,0 +1,17 @@
+{
+  "cloud": "gcp",
+  "environment": "gke",
+  "nodeType": "n2-standard-2",
+  "nodeCount": 2,
+  "k8sVersion": "1.35",
+  "clusterRegion": "europe-west3",
+  "lbType": "gcp-network-lb",
+  "runnerType": "cloud-build",
+  "iterationCount": 1,
+  "suiteStartUtc": "2026-05-08T21:04:36Z",
+  "suiteEndUtc": "2026-05-08T21:06:50Z",
+  "infrastructureProvisioningSeconds": 699,
+  "appDeploySeconds": 36,
+  "lbReadySeconds": 48,
+  "totalTestSuiteDurationSeconds": 134
+}

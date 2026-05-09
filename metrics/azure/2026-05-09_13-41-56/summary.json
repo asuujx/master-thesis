@@ -1,0 +1,1301 @@
+{
+  "cloud": "azure",
+  "environment": "aks",
+  "iterationCount": 30,
+  "generatedAt": "2026-05-09T15:22:23.907Z",
+  "tests": [
+    {
+      "testName": "should add a product to the cart",
+      "url": "http://20.79.244.209/cart",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 0,
+      "flakyRate": 0,
+      "metrics": {
+        "testDuration": {
+          "mean": 771.8,
+          "stddev": 129.9,
+          "min": 606,
+          "p50": 742,
+          "p95": 1010.45,
+          "max": 1172,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 43.78,
+          "stddev": 14.37,
+          "min": 28.4,
+          "p50": 35.35,
+          "p95": 65.59,
+          "max": 68.1,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 72.18,
+          "stddev": 15,
+          "min": 45.6,
+          "p50": 72.3,
+          "p95": 98.95,
+          "max": 104.4,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 72.25,
+          "stddev": 15.01,
+          "min": 45.6,
+          "p50": 72.3,
+          "p95": 99.06,
+          "max": 104.7,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 77.38,
+          "stddev": 14.86,
+          "min": 56,
+          "p50": 72.3,
+          "p95": 99.25,
+          "max": 104.8,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 17.91,
+          "stddev": 7.33,
+          "min": 9.9,
+          "p50": 13.4,
+          "p95": 28.77,
+          "max": 29.4,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 23.78,
+          "stddev": 7.36,
+          "min": 16.1,
+          "p50": 19.4,
+          "p95": 35.37,
+          "max": 35.7,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 1.87,
+          "stddev": 1.03,
+          "min": 1.1,
+          "p50": 1.5,
+          "p95": 4.35,
+          "max": 5.3,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 16751.27,
+          "stddev": 21.1,
+          "min": 16717,
+          "p50": 16754,
+          "p95": 16787,
+          "max": 16787,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 16451.27,
+          "stddev": 21.1,
+          "min": 16417,
+          "p50": 16454,
+          "p95": 16487,
+          "max": 16487,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 16451.27,
+          "stddev": 21.1,
+          "min": 16417,
+          "p50": 16454,
+          "p95": 16487,
+          "max": 16487,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 17,
+          "stddev": 0,
+          "min": 17,
+          "p50": 17,
+          "p95": 17,
+          "max": 17,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 111.73,
+          "stddev": 16.62,
+          "min": 92,
+          "p50": 108,
+          "p95": 136,
+          "max": 136,
+          "n": 30
+        },
+        "lcp": {
+          "mean": 111.73,
+          "stddev": 16.62,
+          "min": 92,
+          "p50": 108,
+          "p95": 136,
+          "max": 136,
+          "n": 30
+        },
+        "cls": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "inp": {
+          "mean": 29.87,
+          "stddev": 6.83,
+          "min": 16,
+          "p50": 32,
+          "p95": 40,
+          "max": 40,
+          "n": 15
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        }
+      }
+    },
+    {
+      "testName": "should clear the cart",
+      "url": "http://20.79.244.209/cart",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 0,
+      "flakyRate": 0,
+      "metrics": {
+        "testDuration": {
+          "mean": 1316.27,
+          "stddev": 239.88,
+          "min": 1149,
+          "p50": 1211,
+          "p95": 1535.15,
+          "max": 2432,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 24.21,
+          "stddev": 8.18,
+          "min": 15.6,
+          "p50": 19.6,
+          "p95": 36.28,
+          "max": 45.8,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 55.82,
+          "stddev": 11.02,
+          "min": 33.9,
+          "p50": 54.85,
+          "p95": 74.89,
+          "max": 77.9,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 55.93,
+          "stddev": 10.98,
+          "min": 34,
+          "p50": 54.95,
+          "p95": 74.94,
+          "max": 77.9,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 59.6,
+          "stddev": 9.76,
+          "min": 43.9,
+          "p50": 59,
+          "p95": 77.27,
+          "max": 79.5,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 23.23,
+          "stddev": 8.16,
+          "min": 14.8,
+          "p50": 18.7,
+          "p95": 34.92,
+          "max": 45,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 2.43,
+          "stddev": 1.53,
+          "min": 1.2,
+          "p50": 1.7,
+          "p95": 5.67,
+          "max": 7,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 7179.33,
+          "stddev": 18.56,
+          "min": 7151,
+          "p50": 7178,
+          "p95": 7205.2,
+          "max": 7215,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 6879.33,
+          "stddev": 18.56,
+          "min": 6851,
+          "p50": 6878,
+          "p95": 6905.2,
+          "max": 6915,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 6879.33,
+          "stddev": 18.56,
+          "min": 6851,
+          "p50": 6878,
+          "p95": 6905.2,
+          "max": 6915,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 16,
+          "stddev": 0,
+          "min": 16,
+          "p50": 16,
+          "p95": 16,
+          "max": 16,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 112.95,
+          "stddev": 10.83,
+          "min": 96,
+          "p50": 116,
+          "p95": 128,
+          "max": 136,
+          "n": 21
+        },
+        "lcp": {
+          "mean": 112.4,
+          "stddev": 10.8,
+          "min": 96,
+          "p50": 116,
+          "p95": 128.4,
+          "max": 136,
+          "n": 20
+        },
+        "cls": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "inp": {
+          "mean": 45,
+          "stddev": 5.57,
+          "min": 32,
+          "p50": 48,
+          "p95": 50,
+          "max": 56,
+          "n": 16
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 11223333.33,
+          "stddev": 125653.85,
+          "min": 11200000,
+          "p50": 11200000,
+          "p95": 11200000,
+          "max": 11900000,
+          "n": 30
+        }
+      }
+    },
+    {
+      "testName": "should display checkout form",
+      "url": "http://20.79.244.209/cart",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 0,
+      "flakyRate": 0,
+      "metrics": {
+        "testDuration": {
+          "mean": 766.53,
+          "stddev": 77.84,
+          "min": 663,
+          "p50": 760.5,
+          "p95": 873.25,
+          "max": 964,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 26.68,
+          "stddev": 7.7,
+          "min": 19.1,
+          "p50": 22.3,
+          "p95": 38.6,
+          "max": 44,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 48.43,
+          "stddev": 10.03,
+          "min": 32.8,
+          "p50": 46.7,
+          "p95": 63.62,
+          "max": 72.3,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 48.54,
+          "stddev": 10.04,
+          "min": 32.9,
+          "p50": 46.8,
+          "p95": 63.75,
+          "max": 72.3,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 53.1,
+          "stddev": 9.03,
+          "min": 39,
+          "p50": 49.8,
+          "p95": 65.85,
+          "max": 72.3,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 23.97,
+          "stddev": 7.31,
+          "min": 17.1,
+          "p50": 19.3,
+          "p95": 35.08,
+          "max": 40.6,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 1.75,
+          "stddev": 0.55,
+          "min": 1.1,
+          "p50": 1.6,
+          "p95": 2.86,
+          "max": 3.1,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 16742.6,
+          "stddev": 16.69,
+          "min": 16709,
+          "p50": 16744,
+          "p95": 16767,
+          "max": 16769,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 16442.6,
+          "stddev": 16.69,
+          "min": 16409,
+          "p50": 16444,
+          "p95": 16467,
+          "max": 16469,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 16442.6,
+          "stddev": 16.69,
+          "min": 16409,
+          "p50": 16444,
+          "p95": 16467,
+          "max": 16469,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 17,
+          "stddev": 0,
+          "min": 17,
+          "p50": 17,
+          "p95": 17,
+          "max": 17,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 86,
+          "stddev": 11.63,
+          "min": 68,
+          "p50": 84,
+          "p95": 106.6,
+          "max": 112,
+          "n": 30
+        },
+        "lcp": {
+          "mean": 86,
+          "stddev": 11.63,
+          "min": 68,
+          "p50": 84,
+          "p95": 106.6,
+          "max": 112,
+          "n": 30
+        },
+        "cls": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "inp": {
+          "mean": 29,
+          "stddev": 6.86,
+          "min": 24,
+          "p50": 28,
+          "p95": 32,
+          "max": 56,
+          "n": 24
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        }
+      }
+    },
+    {
+      "testName": "should complete full purchase",
+      "url": "http://20.79.244.209/cart/checkout",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 3,
+      "flakyRate": 0.1,
+      "metrics": {
+        "testDuration": {
+          "mean": 1159.17,
+          "stddev": 111.91,
+          "min": 1023,
+          "p50": 1118,
+          "p95": 1333.85,
+          "max": 1464,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 32.64,
+          "stddev": 8.03,
+          "min": 22.9,
+          "p50": 28.65,
+          "p95": 44.91,
+          "max": 49.2,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 58.04,
+          "stddev": 12.39,
+          "min": 40.2,
+          "p50": 55.05,
+          "p95": 80.42,
+          "max": 81.9,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 58.15,
+          "stddev": 12.36,
+          "min": 40.2,
+          "p50": 55.35,
+          "p95": 80.47,
+          "max": 82,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 59.21,
+          "stddev": 11.94,
+          "min": 40.4,
+          "p50": 56.9,
+          "p95": 80.56,
+          "max": 82.8,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 30.43,
+          "stddev": 7.91,
+          "min": 21.6,
+          "p50": 26,
+          "p95": 42.2,
+          "max": 46.4,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 1.64,
+          "stddev": 0.6,
+          "min": 0.9,
+          "p50": 1.55,
+          "p95": 2.51,
+          "max": 4.3,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 7103.07,
+          "stddev": 18.02,
+          "min": 7070,
+          "p50": 7100,
+          "p95": 7129.5,
+          "max": 7146,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 6803.07,
+          "stddev": 18.02,
+          "min": 6770,
+          "p50": 6800,
+          "p95": 6829.5,
+          "max": 6846,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 6803.07,
+          "stddev": 18.02,
+          "min": 6770,
+          "p50": 6800,
+          "p95": 6829.5,
+          "max": 6846,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 15,
+          "stddev": 0,
+          "min": 15,
+          "p50": 15,
+          "p95": 15,
+          "max": 15,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 103.33,
+          "stddev": 14.86,
+          "min": 72,
+          "p50": 110,
+          "p95": 115,
+          "max": 116,
+          "n": 6
+        },
+        "lcp": {
+          "mean": 103.33,
+          "stddev": 14.86,
+          "min": 72,
+          "p50": 110,
+          "p95": 115,
+          "max": 116,
+          "n": 6
+        },
+        "cls": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "inp": {
+          "mean": 41.33,
+          "stddev": 5.5,
+          "min": 32,
+          "p50": 40,
+          "p95": 48,
+          "max": 48,
+          "n": 6
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 10320000,
+          "stddev": 299332.59,
+          "min": 10000000,
+          "p50": 10600000,
+          "p95": 10600000,
+          "max": 10600000,
+          "n": 30
+        }
+      }
+    },
+    {
+      "testName": "should load the home page and display products",
+      "url": "http://20.79.244.209/",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 0,
+      "flakyRate": 0,
+      "metrics": {
+        "testDuration": {
+          "mean": 301.6,
+          "stddev": 30.03,
+          "min": 258,
+          "p50": 299.5,
+          "p95": 345.3,
+          "max": 350,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 43.93,
+          "stddev": 14.45,
+          "min": 29.7,
+          "p50": 34.95,
+          "p95": 64.75,
+          "max": 70.2,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 143.85,
+          "stddev": 25.97,
+          "min": 102,
+          "p50": 148.9,
+          "p95": 182.82,
+          "max": 217.6,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 144.02,
+          "stddev": 26.03,
+          "min": 102.1,
+          "p50": 148.9,
+          "p95": 182.88,
+          "max": 217.6,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 181.44,
+          "stddev": 18.75,
+          "min": 147.4,
+          "p50": 178,
+          "p95": 215.14,
+          "max": 245,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 14.29,
+          "stddev": 7.2,
+          "min": 7.5,
+          "p50": 9.85,
+          "p95": 25.15,
+          "max": 25.2,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 28.14,
+          "stddev": 7.44,
+          "min": 19.2,
+          "p50": 24.75,
+          "p95": 38.95,
+          "max": 43.3,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 1.56,
+          "stddev": 0.52,
+          "min": 1.1,
+          "p50": 1.4,
+          "p95": 2.61,
+          "max": 3.6,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 10799,
+          "stddev": 0,
+          "min": 10799,
+          "p50": 10799,
+          "p95": 10799,
+          "max": 10799,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 10499,
+          "stddev": 0,
+          "min": 10499,
+          "p50": 10499,
+          "p95": 10499,
+          "max": 10499,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 10499,
+          "stddev": 0,
+          "min": 10499,
+          "p50": 10499,
+          "p95": 10499,
+          "max": 10499,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 20,
+          "stddev": 0,
+          "min": 20,
+          "p50": 20,
+          "p95": 20,
+          "max": 20,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 924903,
+          "stddev": 0,
+          "min": 924903,
+          "p50": 924903,
+          "p95": 924903,
+          "max": 924903,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 192.27,
+          "stddev": 20.39,
+          "min": 152,
+          "p50": 190,
+          "p95": 222.2,
+          "max": 228,
+          "n": 30
+        },
+        "lcp": {
+          "mean": 222.27,
+          "stddev": 35.58,
+          "min": 152,
+          "p50": 216,
+          "p95": 274.2,
+          "max": 300,
+          "n": 30
+        },
+        "cls": {
+          "mean": 0.14,
+          "stddev": 0.03,
+          "min": 0.09,
+          "p50": 0.13,
+          "p95": 0.2,
+          "max": 0.22,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        }
+      }
+    },
+    {
+      "testName": "should navigate to product details page when a product is clicked",
+      "url": "http://20.79.244.209/product/OLJCESPC7Z",
+      "iterationCount": 30,
+      "passCount": 30,
+      "flakyCount": 0,
+      "flakyRate": 0,
+      "metrics": {
+        "testDuration": {
+          "mean": 474.5,
+          "stddev": 49.72,
+          "min": 402,
+          "p50": 453.5,
+          "p95": 557.7,
+          "max": 567,
+          "n": 30
+        },
+        "ttfb": {
+          "mean": 29.17,
+          "stddev": 7.76,
+          "min": 18.2,
+          "p50": 27.85,
+          "p95": 41.55,
+          "max": 42.9,
+          "n": 30
+        },
+        "domInteractive": {
+          "mean": 55.54,
+          "stddev": 9.85,
+          "min": 38.8,
+          "p50": 55.5,
+          "p95": 70.91,
+          "max": 75.4,
+          "n": 30
+        },
+        "domContentLoaded": {
+          "mean": 55.72,
+          "stddev": 9.89,
+          "min": 38.9,
+          "p50": 55.95,
+          "p95": 71.05,
+          "max": 75.8,
+          "n": 30
+        },
+        "loadComplete": {
+          "mean": 58.88,
+          "stddev": 9.26,
+          "min": 44,
+          "p50": 60.05,
+          "p95": 74.95,
+          "max": 76,
+          "n": 30
+        },
+        "redirectTime": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "dnsLookup": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tcpConnect": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tlsHandshake": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "serverProcessing": {
+          "mean": 25.44,
+          "stddev": 7.96,
+          "min": 16.6,
+          "p50": 22.75,
+          "p95": 37.66,
+          "max": 37.7,
+          "n": 30
+        },
+        "contentDownload": {
+          "mean": 1.95,
+          "stddev": 1.08,
+          "min": 1.1,
+          "p50": 1.5,
+          "p95": 4.37,
+          "max": 5.4,
+          "n": 30
+        },
+        "transferSize": {
+          "mean": 8279.33,
+          "stddev": 15.26,
+          "min": 8257,
+          "p50": 8279,
+          "p95": 8299,
+          "max": 8315,
+          "n": 30
+        },
+        "encodedBodySize": {
+          "mean": 7979.33,
+          "stddev": 15.26,
+          "min": 7957,
+          "p50": 7979,
+          "p95": 7999,
+          "max": 8015,
+          "n": 30
+        },
+        "decodedBodySize": {
+          "mean": 7979.33,
+          "stddev": 15.26,
+          "min": 7957,
+          "p50": 7979,
+          "p95": 7999,
+          "max": 8015,
+          "n": 30
+        },
+        "resourceCount": {
+          "mean": 17,
+          "stddev": 0,
+          "min": 17,
+          "p50": 17,
+          "p95": 17,
+          "max": 17,
+          "n": 30
+        },
+        "totalResourceTransferSize": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "fcp": {
+          "mean": 99.47,
+          "stddev": 11.99,
+          "min": 80,
+          "p50": 98,
+          "p95": 118.2,
+          "max": 120,
+          "n": 30
+        },
+        "lcp": {
+          "mean": 99.47,
+          "stddev": 11.99,
+          "min": 80,
+          "p50": 98,
+          "p95": 118.2,
+          "max": 120,
+          "n": 30
+        },
+        "cls": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "tbt": {
+          "mean": 0,
+          "stddev": 0,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "n": 30
+        },
+        "inp": {
+          "mean": 35.73,
+          "stddev": 7.65,
+          "min": 24,
+          "p50": 32,
+          "p95": 50.4,
+          "max": 56,
+          "n": 15
+        },
+        "jsHeapUsed": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        },
+        "jsHeapTotal": {
+          "mean": 10000000,
+          "stddev": 0,
+          "min": 10000000,
+          "p50": 10000000,
+          "p95": 10000000,
+          "max": 10000000,
+          "n": 30
+        }
+      }
+    }
+  ]
+}

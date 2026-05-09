@@ -1,0 +1,17 @@
+{
+  "cloud": "azure",
+  "environment": "aks",
+  "nodeType": "Standard_D2s_v4",
+  "nodeCount": 2,
+  "k8sVersion": "1.35",
+  "clusterRegion": "germanywestcentral",
+  "lbType": "azure-lb",
+  "runnerType": "azure-pipelines",
+  "iterationCount": 30,
+  "suiteStartUtc": "2026-05-09T11:41:56Z",
+  "suiteEndUtc": "2026-05-09T15:22:23Z",
+  "infrastructureProvisioningSeconds": 257,
+  "appDeploySeconds": 33,
+  "lbReadySeconds": 31,
+  "totalTestSuiteDurationSeconds": 13227
+}
