@@ -1,0 +1,4 @@
+cloud,environment,nodeType,nodeCount,region,runnerType,runDate,iterationCount,infrastructureProvisioningSeconds,appDeploySeconds,lbReadySeconds,totalTestSuiteDurationSeconds,totalRunnerBilledMinutes,totalRunnerExecSeconds,costComputeUsd,costControlPlaneUsd,costLoadBalancerUsd,costCiRunnerUsd,costTotalUsd
+aws,eks,m5.large,2,eu-central-1,codebuild,2026-05-09,30,569,26,23,4495,83,3801,0.30469333333333337,0.15869444444444447,0.039806666666666664,0.41500000000000004,0.9181944444444445
+azure,aks,Standard_D2s_v4,2,germanywestcentral,azure-pipelines,2026-05-09,30,257,33,31,13227,60,2342,0.8885666666666667,0,0.09456944444444444,0.48,1.4631361111111112
+gcp,gke,n2-standard-2,2,europe-west3,cloud-build,2026-05-10,30,688,32,44,4264,68,3648,0.35816,0.148,0.032,0.20400000000000001,0.7421599999999999
