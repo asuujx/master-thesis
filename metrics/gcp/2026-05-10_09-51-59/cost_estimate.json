@@ -1,0 +1,27 @@
+{
+  "cloud": "gcp",
+  "environment": "gke",
+  "nodeType": "n2-standard-2",
+  "nodeCount": 2,
+  "region": "europe-west3",
+  "iterations": 30,
+  "clusterUptimeSeconds": 5328,
+  "lbActiveSeconds": 4608,
+  "totalRunnerExecSeconds": 3648,
+  "totalRunnerBilledMinutes": 68,
+  "iterationsWithTimingData": 30,
+  "pricing": {
+    "computePerNodeHour": 0.121,
+    "controlPlanePerHour": 0.1,
+    "loadBalancerPerHour": 0.025,
+    "ciRunnerPerMinute": 0.003,
+    "estimatedTeardownSeconds": 300
+  },
+  "costs": {
+    "computeUsd": 0.35816,
+    "controlPlaneUsd": 0.148,
+    "loadBalancerUsd": 0.032,
+    "ciRunnerUsd": 0.20400000000000001,
+    "totalUsd": 0.7421599999999999
+  }
+}

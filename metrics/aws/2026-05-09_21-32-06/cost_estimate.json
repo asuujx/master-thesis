@@ -1,0 +1,27 @@
+{
+  "cloud": "aws",
+  "environment": "eks",
+  "nodeType": "m5.large",
+  "nodeCount": 2,
+  "region": "eu-central-1",
+  "iterations": 30,
+  "clusterUptimeSeconds": 5713,
+  "lbActiveSeconds": 5118,
+  "totalRunnerExecSeconds": 3801,
+  "totalRunnerBilledMinutes": 83,
+  "iterationsWithTimingData": 30,
+  "pricing": {
+    "computePerNodeHour": 0.096,
+    "controlPlanePerHour": 0.1,
+    "loadBalancerPerHour": 0.028,
+    "ciRunnerPerMinute": 0.005,
+    "estimatedTeardownSeconds": 600
+  },
+  "costs": {
+    "computeUsd": 0.30469333333333337,
+    "controlPlaneUsd": 0.15869444444444447,
+    "loadBalancerUsd": 0.039806666666666664,
+    "ciRunnerUsd": 0.41500000000000004,
+    "totalUsd": 0.9181944444444445
+  }
+}

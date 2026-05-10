@@ -1,0 +1,27 @@
+{
+  "cloud": "azure",
+  "environment": "aks",
+  "nodeType": "Standard_D2s_v4",
+  "nodeCount": 2,
+  "region": "germanywestcentral",
+  "iterations": 30,
+  "clusterUptimeSeconds": 13908,
+  "lbActiveSeconds": 13618,
+  "totalRunnerExecSeconds": 2342,
+  "totalRunnerBilledMinutes": 60,
+  "iterationsWithTimingData": 30,
+  "pricing": {
+    "computePerNodeHour": 0.115,
+    "controlPlanePerHour": 0,
+    "loadBalancerPerHour": 0.025,
+    "ciRunnerPerMinute": 0.008,
+    "estimatedTeardownSeconds": 360
+  },
+  "costs": {
+    "computeUsd": 0.8885666666666667,
+    "controlPlaneUsd": 0,
+    "loadBalancerUsd": 0.09456944444444444,
+    "ciRunnerUsd": 0.48,
+    "totalUsd": 1.4631361111111112
+  }
+}
