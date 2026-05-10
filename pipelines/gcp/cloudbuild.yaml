@@ -10,6 +10,7 @@ steps:
         npm ci
         npx playwright install chromium --with-deps
         INSTALL_END=$(date +%s)
+        bash scripts/metrics/measure-rtt.sh "$_BASE_URL" || true
         TEST_START=$(date +%s)
         # Capture the e2e exit code but always succeed this step so the upload step still runs.
         set +e
@@ -43,7 +44,6 @@ steps:
     args:
       - '-c'
       - |
-        bash scripts/metrics/measure-rtt.sh "$_BASE_URL" || echo "WARNING: measure-rtt.sh failed"
         # Always upload available artifacts — failures still produce useful diagnostic data.
         gsutil -m cp -r results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/results/ 2>/dev/null || true
         gsutil -m cp -r test-results/** gs://thesis-test-artifacts-$PROJECT_ID/runs/$BUILD_ID/test-results/ 2>/dev/null || true
