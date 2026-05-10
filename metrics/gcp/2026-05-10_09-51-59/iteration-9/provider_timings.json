@@ -1,0 +1,8 @@
+{
+  "submitEpoch": 1778400604,
+  "runnerCreateIso": "2026-05-10T08:10:06.891776315Z",
+  "runnerStartIso": "2026-05-10T08:10:07.832074925Z",
+  "runnerEndIso": "2026-05-10T08:12:57.002785Z",
+  "runnerQueueSeconds": 1,
+  "runnerExecutionSeconds": 170
+}
