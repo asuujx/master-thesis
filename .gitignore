@@ -11,7 +11,7 @@ playwright-report/
 blob-report/
 playwright/.cache/
 playwright/.auth/
-results/
+tests/results/
 
 # Terraform / Terragrunt
 infrastructure/**/.terraform/
