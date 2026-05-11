@@ -1,0 +1,453 @@
+{
+  "config": {
+    "configFile": "/Users/peter/Programming/master-thesis/tests/playwright.config.ts",
+    "rootDir": "/Users/peter/Programming/master-thesis/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/peter/Programming/master-thesis/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/peter/Programming/master-thesis/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "results/results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "docker compose -f ../app/docker-compose.yml up",
+      "url": "http://localhost:8080",
+      "timeout": 120000,
+      "reuseExistingServer": true,
+      "stdout": "pipe",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "cart.spec.ts",
+      "file": "cart.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Cart",
+          "file": "cart.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should add a product to the cart",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 688,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:46:01.458Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should add a product to the cart.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgYWRkIGEgcHJvZHVjdCB0byB0aGUgY2FydCIsCiAgInVybCI6ICJodHRwOi8vbG9jYWxob3N0OjgwODAvY2FydCIsCiAgImVudmlyb25tZW50IjogImxvY2FsIiwKICAiY2xvdWQiOiAibG9jYWwiLAogICJ0aW1lc3RhbXAiOiAiMjAyNi0wNS0xMVQxNzo0NjowMi4xMTRaIiwKICAiaXRlcmF0aW9uIjogMSwKICAiYXR0ZW1wdE51bWJlciI6IDEsCiAgInBhc3NlZCI6IHRydWUsCiAgIm5vZGVUeXBlIjogInVua25vd24iLAogICJub2RlQ291bnQiOiAwLAogICJrOHNWZXJzaW9uIjogInVua25vd24iLAogICJjbHVzdGVyUmVnaW9uIjogInVua25vd24iLAogICJsYlR5cGUiOiAidW5rbm93biIsCiAgInJ1bm5lclR5cGUiOiAidW5rbm93biIsCiAgInRlc3REdXJhdGlvbiI6IDUxMiwKICAidHRmYiI6IDE5LjM5OTk5OTk3NjE1ODE0MiwKICAiZG9tSW50ZXJhY3RpdmUiOiAyMy42OTk5OTk5ODgwNzkwNywKICAiZG9tQ29udGVudExvYWRlZCI6IDIzLjc5OTk5OTk1MjMxNjI4NCwKICAibG9hZENvbXBsZXRlIjogMjYuMzk5OTk5OTc2MTU4MTQyLAogICJyZWRpcmVjdFRpbWUiOiA1LjgwMDAwMDAxMTkyMDkyOSwKICAiZG5zTG9va3VwIjogMCwKICAidGNwQ29ubmVjdCI6IDAsCiAgInRsc0hhbmRzaGFrZSI6IDAsCiAgInNlcnZlclByb2Nlc3NpbmciOiAxMy4xOTk5OTk5ODgwNzkwNzEsCiAgImNvbnRlbnREb3dubG9hZCI6IDAuMzAwMDAwMDExOTIwOTI4OTYsCiAgInRyYW5zZmVyU2l6ZSI6IDE2Njg5LAogICJlbmNvZGVkQm9keVNpemUiOiAxNjM4OSwKICAiZGVjb2RlZEJvZHlTaXplIjogMTYzODksCiAgInJlc291cmNlQ291bnQiOiAxNywKICAidG90YWxSZXNvdXJjZVRyYW5zZmVyU2l6ZSI6IDAsCiAgImZjcCI6IC0xLAogICJsY3AiOiAtMSwKICAiY2xzIjogMCwKICAidGJ0IjogMCwKICAiaW5wIjogLTEsCiAgImpzSGVhcFVzZWQiOiAxMDAwMDAwMCwKICAianNIZWFwVG90YWwiOiAxMDAwMDAwMAp9"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/cart-Cart-should-add-a-product-to-the-cart-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1981448f0b79506fb670-61a66920b21558062457",
+              "file": "cart.spec.ts",
+              "line": 15,
+              "column": 7
+            },
+            {
+              "title": "should clear the cart",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 923,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:46:02.273Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should clear the cart.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgY2xlYXIgdGhlIGNhcnQiLAogICJ1cmwiOiAiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2NhcnQiLAogICJlbnZpcm9ubWVudCI6ICJsb2NhbCIsCiAgImNsb3VkIjogImxvY2FsIiwKICAidGltZXN0YW1wIjogIjIwMjYtMDUtMTFUMTc6NDY6MDMuMDY5WiIsCiAgIml0ZXJhdGlvbiI6IDEsCiAgImF0dGVtcHROdW1iZXIiOiAxLAogICJwYXNzZWQiOiB0cnVlLAogICJub2RlVHlwZSI6ICJ1bmtub3duIiwKICAibm9kZUNvdW50IjogMCwKICAiazhzVmVyc2lvbiI6ICJ1bmtub3duIiwKICAiY2x1c3RlclJlZ2lvbiI6ICJ1bmtub3duIiwKICAibGJUeXBlIjogInVua25vd24iLAogICJydW5uZXJUeXBlIjogInVua25vd24iLAogICJ0ZXN0RHVyYXRpb24iOiA3NTksCiAgInR0ZmIiOiAxMC45MDAwMDAwMzU3NjI3ODcsCiAgImRvbUludGVyYWN0aXZlIjogMTUuNjk5OTk5OTg4MDc5MDcxLAogICJkb21Db250ZW50TG9hZGVkIjogMTUuNjk5OTk5OTg4MDc5MDcxLAogICJsb2FkQ29tcGxldGUiOiAxNy4xMDAwMDAwMjM4NDE4NTgsCiAgInJlZGlyZWN0VGltZSI6IDAsCiAgImRuc0xvb2t1cCI6IDAsCiAgInRjcENvbm5lY3QiOiAwLAogICJ0bHNIYW5kc2hha2UiOiAwLAogICJzZXJ2ZXJQcm9jZXNzaW5nIjogMTAuNDAwMDAwMDM1NzYyNzg3LAogICJjb250ZW50RG93bmxvYWQiOiAwLjI5OTk5OTk1MjMxNjI4NDIsCiAgInRyYW5zZmVyU2l6ZSI6IDcxMTEsCiAgImVuY29kZWRCb2R5U2l6ZSI6IDY4MTEsCiAgImRlY29kZWRCb2R5U2l6ZSI6IDY4MTEsCiAgInJlc291cmNlQ291bnQiOiAxNiwKICAidG90YWxSZXNvdXJjZVRyYW5zZmVyU2l6ZSI6IDAsCiAgImZjcCI6IC0xLAogICJsY3AiOiAtMSwKICAiY2xzIjogMCwKICAidGJ0IjogMCwKICAiaW5wIjogLTEsCiAgImpzSGVhcFVzZWQiOiAxMDAwMDAwMCwKICAianNIZWFwVG90YWwiOiAxMTkwMDAwMAp9"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/cart-Cart-should-clear-the-cart-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1981448f0b79506fb670-32899d75effe18842ae3",
+              "file": "cart.spec.ts",
+              "line": 25,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "checkout.spec.ts",
+      "file": "checkout.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Checkout",
+          "file": "checkout.spec.ts",
+          "line": 23,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display checkout form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 684,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:46:03.249Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should display checkout form.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgZGlzcGxheSBjaGVja291dCBmb3JtIiwKICAidXJsIjogImh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9jYXJ0IiwKICAiZW52aXJvbm1lbnQiOiAibG9jYWwiLAogICJjbG91ZCI6ICJsb2NhbCIsCiAgInRpbWVzdGFtcCI6ICIyMDI2LTA1LTExVDE3OjQ2OjAzLjgzMVoiLAogICJpdGVyYXRpb24iOiAxLAogICJhdHRlbXB0TnVtYmVyIjogMSwKICAicGFzc2VkIjogdHJ1ZSwKICAibm9kZVR5cGUiOiAidW5rbm93biIsCiAgIm5vZGVDb3VudCI6IDAsCiAgIms4c1ZlcnNpb24iOiAidW5rbm93biIsCiAgImNsdXN0ZXJSZWdpb24iOiAidW5rbm93biIsCiAgImxiVHlwZSI6ICJ1bmtub3duIiwKICAicnVubmVyVHlwZSI6ICJ1bmtub3duIiwKICAidGVzdER1cmF0aW9uIjogNTQ0LAogICJ0dGZiIjogMTcuNjAwMDAwMDIzODQxODU4LAogICJkb21JbnRlcmFjdGl2ZSI6IDIyLjMwMDAwMDAxMTkyMDkzLAogICJkb21Db250ZW50TG9hZGVkIjogMjIuMzAwMDAwMDExOTIwOTMsCiAgImxvYWRDb21wbGV0ZSI6IDI0LjQwMDAwMDAzNTc2Mjc4NywKICAicmVkaXJlY3RUaW1lIjogMCwKICAiZG5zTG9va3VwIjogMCwKICAidGNwQ29ubmVjdCI6IDAsCiAgInRsc0hhbmRzaGFrZSI6IDAsCiAgInNlcnZlclByb2Nlc3NpbmciOiAxNy4xMDAwMDAwMjM4NDE4NTgsCiAgImNvbnRlbnREb3dubG9hZCI6IDAuMTk5OTk5OTg4MDc5MDcxMDQsCiAgInRyYW5zZmVyU2l6ZSI6IDE2NzA1LAogICJlbmNvZGVkQm9keVNpemUiOiAxNjQwNSwKICAiZGVjb2RlZEJvZHlTaXplIjogMTY0MDUsCiAgInJlc291cmNlQ291bnQiOiAxNywKICAidG90YWxSZXNvdXJjZVRyYW5zZmVyU2l6ZSI6IDAsCiAgImZjcCI6IC0xLAogICJsY3AiOiAtMSwKICAiY2xzIjogMCwKICAidGJ0IjogMCwKICAiaW5wIjogLTEsCiAgImpzSGVhcFVzZWQiOiAxMDAwMDAwMCwKICAianNIZWFwVG90YWwiOiAxMDAwMDAwMAp9"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-display-checkout-form-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-2b23b436ddba1c054493",
+              "file": "checkout.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "should complete full purchase",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 60245,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/peter/Programming/master-thesis/tests/support/metrics.ts",
+                            "column": 36,
+                            "line": 123
+                          },
+                          "message": "Error: page.evaluate: Target page, context or browser has been closed\n\n   at ../support/metrics.ts:123\n\n  121 |     const url = this.page.url();\n  122 |\n> 123 |     const timing = await this.page.evaluate(() => {\n      |                                    ^\n  124 |       const nav = performance.getEntriesByType(\n  125 |         \"navigation\",\n  126 |       )[0] as PerformanceNavigationTiming;\n    at MetricsCollector.collect (/Users/peter/Programming/master-thesis/tests/support/metrics.ts:123:36)\n    at withMetrics (/Users/peter/Programming/master-thesis/tests/support/metrics.ts:260:35)\n    at /Users/peter/Programming/master-thesis/tests/e2e/checkout.spec.ts:45:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:46:03.970Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-complete-full-purchase-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-complete-full-purchase-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-complete-full-purchase-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-complete-full-purchase-chromium/trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 963,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-11T17:47:04.728Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should complete full purchase.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgY29tcGxldGUgZnVsbCBwdXJjaGFzZSIsCiAgInVybCI6ICJodHRwOi8vbG9jYWxob3N0OjgwODAvY2FydC9jaGVja291dCIsCiAgImVudmlyb25tZW50IjogImxvY2FsIiwKICAiY2xvdWQiOiAibG9jYWwiLAogICJ0aW1lc3RhbXAiOiAiMjAyNi0wNS0xMVQxNzo0NzowNS42ODFaIiwKICAiaXRlcmF0aW9uIjogMSwKICAiYXR0ZW1wdE51bWJlciI6IDIsCiAgInBhc3NlZCI6IHRydWUsCiAgIm5vZGVUeXBlIjogInVua25vd24iLAogICJub2RlQ291bnQiOiAwLAogICJrOHNWZXJzaW9uIjogInVua25vd24iLAogICJjbHVzdGVyUmVnaW9uIjogInVua25vd24iLAogICJsYlR5cGUiOiAidW5rbm93biIsCiAgInJ1bm5lclR5cGUiOiAidW5rbm93biIsCiAgInRlc3REdXJhdGlvbiI6IDgwNywKICAidHRmYiI6IDU2LjA5OTk5OTk2NDIzNzIxLAogICJkb21JbnRlcmFjdGl2ZSI6IDYxLAogICJkb21Db250ZW50TG9hZGVkIjogNjEsCiAgImxvYWRDb21wbGV0ZSI6IDYxLjUsCiAgInJlZGlyZWN0VGltZSI6IDAsCiAgImRuc0xvb2t1cCI6IDAsCiAgInRjcENvbm5lY3QiOiAwLAogICJ0bHNIYW5kc2hha2UiOiAwLAogICJzZXJ2ZXJQcm9jZXNzaW5nIjogNTUuNSwKICAiY29udGVudERvd25sb2FkIjogMC4zMDAwMDAwMTE5MjA5Mjg5NiwKICAidHJhbnNmZXJTaXplIjogNzAxMCwKICAiZW5jb2RlZEJvZHlTaXplIjogNjcxMCwKICAiZGVjb2RlZEJvZHlTaXplIjogNjcxMCwKICAicmVzb3VyY2VDb3VudCI6IDE1LAogICJ0b3RhbFJlc291cmNlVHJhbnNmZXJTaXplIjogMCwKICAiZmNwIjogLTEsCiAgImxjcCI6IC0xLAogICJjbHMiOiAwLAogICJ0YnQiOiAwLAogICJpbnAiOiAtMSwKICAianNIZWFwVXNlZCI6IDEwMDAwMDAwLAogICJqc0hlYXBUb3RhbCI6IDEwNjAwMDAwCn0="
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/checkout-Checkout-should-complete-full-purchase-chromium-retry1/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "flaky"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-53543da26f9a9723981e",
+              "file": "checkout.spec.ts",
+              "line": 44,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "home.spec.ts",
+      "file": "home.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Home page",
+          "file": "home.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should load the home page and display products",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 495,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:47:05.847Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should load the home page and display products.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgbG9hZCB0aGUgaG9tZSBwYWdlIGFuZCBkaXNwbGF5IHByb2R1Y3RzIiwKICAidXJsIjogImh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC8iLAogICJlbnZpcm9ubWVudCI6ICJsb2NhbCIsCiAgImNsb3VkIjogImxvY2FsIiwKICAidGltZXN0YW1wIjogIjIwMjYtMDUtMTFUMTc6NDc6MDYuMjAzWiIsCiAgIml0ZXJhdGlvbiI6IDEsCiAgImF0dGVtcHROdW1iZXIiOiAxLAogICJwYXNzZWQiOiB0cnVlLAogICJub2RlVHlwZSI6ICJ1bmtub3duIiwKICAibm9kZUNvdW50IjogMCwKICAiazhzVmVyc2lvbiI6ICJ1bmtub3duIiwKICAiY2x1c3RlclJlZ2lvbiI6ICJ1bmtub3duIiwKICAibGJUeXBlIjogInVua25vd24iLAogICJydW5uZXJUeXBlIjogInVua25vd24iLAogICJ0ZXN0RHVyYXRpb24iOiAzMTgsCiAgInR0ZmIiOiAyMy4zMDAwMDAwMTE5MjA5MywKICAiZG9tSW50ZXJhY3RpdmUiOiAxOTIuMTk5OTk5OTg4MDc5MDcsCiAgImRvbUNvbnRlbnRMb2FkZWQiOiAxOTIuMTk5OTk5OTg4MDc5MDcsCiAgImxvYWRDb21wbGV0ZSI6IDI5NS4xOTk5OTk5ODgwNzkwNywKICAicmVkaXJlY3RUaW1lIjogMCwKICAiZG5zTG9va3VwIjogMCwKICAidGNwQ29ubmVjdCI6IDAuMTk5OTk5OTg4MDc5MDcxMDQsCiAgInRsc0hhbmRzaGFrZSI6IDAsCiAgInNlcnZlclByb2Nlc3NpbmciOiAyMi42MDAwMDAwMjM4NDE4NTgsCiAgImNvbnRlbnREb3dubG9hZCI6IDAuMzk5OTk5OTc2MTU4MTQyMSwKICAidHJhbnNmZXJTaXplIjogMTA2ODMsCiAgImVuY29kZWRCb2R5U2l6ZSI6IDEwMzgzLAogICJkZWNvZGVkQm9keVNpemUiOiAxMDM4MywKICAicmVzb3VyY2VDb3VudCI6IDIwLAogICJ0b3RhbFJlc291cmNlVHJhbnNmZXJTaXplIjogOTI0OTA0LAogICJmY3AiOiAyMDAsCiAgImxjcCI6IDI0MCwKICAiY2xzIjogMC4xMjgsCiAgInRidCI6IDAsCiAgImlucCI6IC0xLAogICJqc0hlYXBVc2VkIjogMTAwMDAwMDAsCiAgImpzSGVhcFRvdGFsIjogMTAwMDAwMDAKfQ=="
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/home-Home-page-should-load-0b550-e-page-and-display-products-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d318381359a9b96acb1e-835eb7f171ccddc6fa8e",
+              "file": "home.spec.ts",
+              "line": 15,
+              "column": 7
+            },
+            {
+              "title": "should navigate to product details page when a product is clicked",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 608,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T17:47:06.380Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "local_local_should navigate to product details page when a product is clicked.json",
+                          "contentType": "application/json",
+                          "body": "ewogICJ0ZXN0TmFtZSI6ICJzaG91bGQgbmF2aWdhdGUgdG8gcHJvZHVjdCBkZXRhaWxzIHBhZ2Ugd2hlbiBhIHByb2R1Y3QgaXMgY2xpY2tlZCIsCiAgInVybCI6ICJodHRwOi8vbG9jYWxob3N0OjgwODAvcHJvZHVjdC9PTEpDRVNQQzdaIiwKICAiZW52aXJvbm1lbnQiOiAibG9jYWwiLAogICJjbG91ZCI6ICJsb2NhbCIsCiAgInRpbWVzdGFtcCI6ICIyMDI2LTA1LTExVDE3OjQ3OjA2LjgzOVoiLAogICJpdGVyYXRpb24iOiAxLAogICJhdHRlbXB0TnVtYmVyIjogMSwKICAicGFzc2VkIjogdHJ1ZSwKICAibm9kZVR5cGUiOiAidW5rbm93biIsCiAgIm5vZGVDb3VudCI6IDAsCiAgIms4c1ZlcnNpb24iOiAidW5rbm93biIsCiAgImNsdXN0ZXJSZWdpb24iOiAidW5rbm93biIsCiAgImxiVHlwZSI6ICJ1bmtub3duIiwKICAicnVubmVyVHlwZSI6ICJ1bmtub3duIiwKICAidGVzdER1cmF0aW9uIjogNDIyLAogICJ0dGZiIjogMTcuOTAwMDAwMDM1NzYyNzg3LAogICJkb21JbnRlcmFjdGl2ZSI6IDIzLjgwMDAwMDAxMTkyMDkzLAogICJkb21Db250ZW50TG9hZGVkIjogMjMuODAwMDAwMDExOTIwOTMsCiAgImxvYWRDb21wbGV0ZSI6IDI1LjgwMDAwMDAxMTkyMDkzLAogICJyZWRpcmVjdFRpbWUiOiAwLAogICJkbnNMb29rdXAiOiAwLAogICJ0Y3BDb25uZWN0IjogMCwKICAidGxzSGFuZHNoYWtlIjogMCwKICAic2VydmVyUHJvY2Vzc2luZyI6IDE3LjMwMDAwMDAxMTkyMDkzLAogICJjb250ZW50RG93bmxvYWQiOiAwLjgwMDAwMDAxMTkyMDkyOSwKICAidHJhbnNmZXJTaXplIjogODIxNywKICAiZW5jb2RlZEJvZHlTaXplIjogNzkxNywKICAiZGVjb2RlZEJvZHlTaXplIjogNzkxNywKICAicmVzb3VyY2VDb3VudCI6IDE3LAogICJ0b3RhbFJlc291cmNlVHJhbnNmZXJTaXplIjogMCwKICAiZmNwIjogNjQsCiAgImxjcCI6IDY0LAogICJjbHMiOiAwLAogICJ0YnQiOiAwLAogICJpbnAiOiAtMSwKICAianNIZWFwVXNlZCI6IDEwMDAwMDAwLAogICJqc0hlYXBUb3RhbCI6IDEwMDAwMDAwCn0="
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peter/Programming/master-thesis/test-results/home-Home-page-should-navi-70045-e-when-a-product-is-clicked-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d318381359a9b96acb1e-1752507fb419cdd41c02",
+              "file": "home.spec.ts",
+              "line": 26,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-11T17:46:01.132Z",
+    "duration": 65919.924,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 1
+  }
+}
