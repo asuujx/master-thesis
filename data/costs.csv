@@ -1,0 +1,4 @@
+cloud,environment,region,node_type,node_count,iterations,cluster_uptime_s,runner_billed_min,cost_compute_usd,cost_control_plane_usd,cost_lb_usd,cost_ci_runner_usd,cost_total_usd
+aws,eks,eu-central-1,m5.large,2,30,5713,83,0.3047,0.1587,0.0398,0.4150,0.9182
+azure,aks,germanywestcentral,Standard_D2s_v4,2,30,13908,60,0.8886,0.0000,0.0946,0.4800,1.4631
+gcp,gke,europe-west3,n2-standard-2,2,30,5328,68,0.3582,0.1480,0.0320,0.2040,0.7422
