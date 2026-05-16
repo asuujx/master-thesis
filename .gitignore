@@ -2,6 +2,9 @@
 .env
 .DS_Store
 
+# Jupyter
+.ipynb_checkpoints/
+
 # Dependencies
 node_modules/
 
