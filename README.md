@@ -111,3 +111,42 @@ Scripts that produce these files:
 - `scripts/metrics/capture-kube-metrics.sh` — kubectl top snapshots
 - `scripts/metrics/measure-rtt.sh` — network RTT probes
 - `scripts/metrics/summarize.js` — per-run summary aggregation
+
+---
+
+## Data analysis
+
+### Aggregate raw metrics into CSVs
+
+After one or more cloud runs exist under `metrics/<cloud>/`, flatten them into the two CSVs used for analysis:
+
+```bash
+node scripts/aggregate-results.js
+```
+
+Reads every `metrics/{aws,azure,gcp}/*/` run directory and writes:
+
+- `metrics/results/raw.csv` — one row per (cloud × iteration × testName)
+- `metrics/results/summary.csv` — one row per (cloud × testName), aggregated stats
+
+Copy (or symlink) the ones you want to analyze into `data/` — `data/raw.csv` and `data/summary.csv` are the snapshots currently used by the notebook.
+
+### Estimate infrastructure costs
+
+```bash
+node scripts/estimate-costs.js metrics/aws/<run> metrics/azure/<run> metrics/gcp/<run>
+```
+
+Prints a cost comparison table to stdout and writes `cost_estimate.json` into each run directory, using the on-demand pricing tables baked into the script. Consolidate the results into `data/costs.csv` for use in the notebook.
+
+### Notebook (`data/descriptive.ipynb`)
+
+Generates the descriptive-statistics plots used in the thesis (flakiness heatmap, runner overhead, RTT decomposition, metric boxplots, etc.) from `data/raw.csv`, `data/summary.csv`, and `data/costs.csv`, saving figures to `data/figures/`.
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install jupyterlab pandas numpy matplotlib seaborn
+jupyter lab data/descriptive.ipynb
+```
+
+Run all cells top to bottom — section 1 loads and shapes the data, section 2 generates and saves each plot. The notebook resolves paths relative to the repo root (`ROOT = Path('..').resolve()`), so it must stay in `data/` and be launched from within that folder (or with its working directory set there).
