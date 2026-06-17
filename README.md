@@ -82,7 +82,7 @@ Azure DevOps org: `balon-thesis`, project: `thesis`.
 | Artifacts | S3 | GCS | Azure Blob Storage |
 | Pipeline file | `pipelines/aws/buildspec.yml` | `pipelines/gcp/cloudbuild.yaml` | `pipelines/azure/azure-pipelines.yml` |
 
-† Microsoft-hosted agents do not support region selection — runner may be in West Europe (Amsterdam) rather than germanywestcentral. See thesis limitations.
+Microsoft-hosted agents do not support region selection — runner may be in West Europe (Amsterdam) rather than germanywestcentral. See thesis limitations.
 
 ---
 
