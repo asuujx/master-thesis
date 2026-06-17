@@ -74,12 +74,12 @@ Azure DevOps org: `balon-thesis`, project: `thesis`.
 
 ## Infrastructure summary
 
-| | AWS | GCP | Azure |
-| --- | --- | --- | --- |
-| Kubernetes | EKS 1.35 (eu-central-1) | GKE 1.35 zonal (europe-west3-c) | AKS 1.35 (germanywestcentral) |
-| Nodes | 2× m5.large (2 vCPU, 8 GB) | 2× n2-standard-2 (2 vCPU, 8 GB) | 2× Standard_D2s_v4 (2 vCPU, 8 GB) |
-| CI runner | CodeBuild (eu-central-1) | Cloud Build (europe-west3) | Azure Pipelines (West Europe†) |
-| Artifacts | S3 | GCS | Azure Blob Storage |
+|               | AWS                           | GCP                             | Azure                                 |
+| ------------- | ----------------------------- | ------------------------------- | ------------------------------------- |
+| Kubernetes    | EKS 1.35 (eu-central-1)       | GKE 1.35 zonal (europe-west3-c) | AKS 1.35 (germanywestcentral)         |
+| Nodes         | 2× m5.large (2 vCPU, 8 GB)    | 2× n2-standard-2 (2 vCPU, 8 GB) | 2× Standard_D2s_v4 (2 vCPU, 8 GB)     |
+| CI runner     | CodeBuild (eu-central-1)      | Cloud Build (europe-west3)      | Azure Pipelines (West Europe)         |
+| Artifacts     | S3                            | GCS                             | Azure Blob Storage                    |
 | Pipeline file | `pipelines/aws/buildspec.yml` | `pipelines/gcp/cloudbuild.yaml` | `pipelines/azure/azure-pipelines.yml` |
 
 Microsoft-hosted agents do not support region selection — runner may be in West Europe (Amsterdam) rather than germanywestcentral. See thesis limitations.
